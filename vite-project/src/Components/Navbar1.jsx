@@ -15,6 +15,7 @@ function Navbar1() {
             <Nav.Link href="/Registrarse" className='fs-4'>Registrarse</Nav.Link>
             <Nav.Link href="/Drive" className='fs-4'>Drive</Nav.Link>
             <Nav.Link href="/Reportes" className='fs-4'>Reportes</Nav.Link>
+            <Nav.Link href="/PythonDrive" className='fs-4'>Python Drive</Nav.Link>
 
           </Nav>
         </Container>
