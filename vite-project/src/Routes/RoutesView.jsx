@@ -6,6 +6,7 @@ import Registrarse from '../Pages/Registrarse'
 import Drive from '../Pages/Drive'
 import Reportes from '../Pages/Reportes'
 import OlvidarContrasenia from '../Pages/OlvidarContrasenia'
+import PythonDrive from '../Pages/PythonDrive'
 
 const RoutesView = () => {
   return (
@@ -16,7 +17,8 @@ const RoutesView = () => {
         <Route path='/Drive' element={<Drive/>}/>
         <Route path='/Reportes' element={<Reportes/>}/>
         <Route path='/OlvidarContrasenia' element={<OlvidarContrasenia/>}/>
-    
+        <Route path='/PythonDrive' element={<PythonDrive/>}/>
+
     </Routes>
   )
 }
