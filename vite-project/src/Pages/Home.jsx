@@ -1,23 +1,37 @@
-import React from "react";
-import Navbar1 from "../Components/Navbar1";
-import logo from "../assets/logo.png";
-import { Container, Row, Col } from "react-bootstrap";
+import React, { useState } from "react";
+
+import NavbarLateral from "../Components/NavbarLateral";
+
+import HomeAdmin from "./HomeAdmin";
+import HomePublic from "./HomePublic";
 
 const Home = () => {
+
+  // CAMBIAR PARA PROBAR
+
+  // Usuario NO logueado
+  // const [user] = useState(null);
+
+  // Usuario admin
+  const [user] = useState({
+    name: "Admin",
+    role: "admin",
+  });
+
   return (
-    <>
-      <Navbar1 />
-      <Container>
-        <Row>
-          <Col className="text-center py-5">
-            <img src={logo} alt="logo de la universidad" />
-            <h1>Universidad Tecnológica Nacional</h1>
-            <h2>Facultad Regional Tucumán</h2>
-            <h3>"Ingeniería en sistemas de información"</h3>
-          </Col>
-        </Row>
-      </Container>
-    </>
+    <div className="min-h-screen bg-gray-100">
+
+      <NavbarLateral user={user} />
+
+      <main className="ml-64 p-10">
+
+        {!user && <HomePublic />}
+
+        {user?.role === "admin" && <HomeAdmin />}
+
+      </main>
+
+    </div>
   );
 };
 
