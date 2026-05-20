@@ -1,283 +1,396 @@
-// src/pages/Trazabilidad.jsx
-
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+import axios from "axios";
+
+import {
+  CalendarDays,
+  Clock3,
+  ChevronDown,
+  ArrowUpRight,
+} from "lucide-react";
 
 import NavbarLateral from "../components/NavbarLateral";
 
-import {
-  Bell,
-  Plus,
-  ArrowUpRight,
-  Clock3,
-  CheckCircle2,
-  FileSearch,
-  CalendarDays,
-} from "lucide-react";
+export default function Trazabilidad() {
 
-const expedientesMock = [
-  {
-    id: 1,
-    codigo: "EXP-2025-047",
-    titulo: "Beca comedor Pérez",
-    estado: "En análisis",
-    timeline: [
-      {
-        titulo: "Expediente creado",
-        descripcion: "Mesa de entrada registró el expediente",
-        fecha: "02/05/2025",
-        icon: "clock",
-      },
-      {
-        titulo: "Asignado a comisión estudiantil",
-        descripcion: "Expediente enviado para análisis",
-        fecha: "05/05/2025",
-        icon: "search",
-      },
-      {
-        titulo: "Despacho emitido",
-        descripcion: "Comisión emite dictamen favorable",
-        fecha: "09/05/2025",
-        icon: "check",
-      },
-      {
-        titulo: "En Orden del día — Sesión 06/2025",
-        descripcion: "Punto 3 del orden del día",
-        fecha: "20/05/2025",
-        icon: "calendar",
-      },
-    ],
-  },
-
-  {
-    id: 2,
-    codigo: "EXP-2025-046",
-    titulo: "Designación auxiliar",
-    estado: "Pendiente",
-    timeline: [
-      {
-        titulo: "Expediente creado",
-        descripcion: "Ingresado por departamento académico",
-        fecha: "01/05/2025",
-        icon: "clock",
-      },
-      {
-        titulo: "En revisión",
-        descripcion: "Área administrativa revisa documentación",
-        fecha: "03/05/2025",
-        icon: "search",
-      },
-    ],
-  },
-
-  {
-    id: 3,
-    codigo: "EXP-2025-043",
-    titulo: "Impugnación concurso",
-    estado: "Finalizado",
-    timeline: [
-      {
-        titulo: "Presentación realizada",
-        descripcion: "Impugnación registrada correctamente",
-        fecha: "28/04/2025",
-        icon: "clock",
-      },
-      {
-        titulo: "Resolución aprobada",
-        descripcion: "Consejo directivo resolvió el expediente",
-        fecha: "12/05/2025",
-        icon: "check",
-      },
-    ],
-  },
-];
-
-const Trazabilidad = () => {
   const navigate = useNavigate();
 
-  const user = { role: "admin" };
+  // EXPEDIENTES
+  const [expedientes, setExpedientes] = useState([]);
 
-  const [expedienteSeleccionado, setExpedienteSeleccionado] = useState(
-    expedientesMock[0]
-  );
+  // EXPEDIENTE SELECCIONADO
+  const [expedienteSeleccionado, setExpedienteSeleccionado] =
+    useState(null);
 
-  const renderIcon = (icon) => {
-    switch (icon) {
-      case "clock":
-        return <Clock3 size={18} />;
+  // OBTENER EXPEDIENTES
+  const obtenerExpedientes = async () => {
+    try {
 
-      case "search":
-        return <FileSearch size={18} />;
+      const response = await axios.get(
+        "http://127.0.0.1:5000/api/expedientes"
+      );
 
-      case "check":
-        return <CheckCircle2 size={18} />;
+      setExpedientes(response.data);
 
-      case "calendar":
-        return <CalendarDays size={18} />;
+      // seleccionar primero
+      if (response.data.length > 0) {
+        setExpedienteSeleccionado(response.data[0]);
+      }
 
-      default:
-        return <Clock3 size={18} />;
+    } catch (error) {
+
+      console.error(error);
+
+      alert("Error al obtener expedientes");
     }
   };
 
-  return (
-    <div className="min-h-screen bg-slate-100">
-      {/* Sidebar */}
-      <NavbarLateral user={user} />
+  useEffect(() => {
+    obtenerExpedientes();
+  }, []);
 
-      {/* Main */}
-      <main className="ml-64 p-8">
-        {/* Header */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 px-6 py-5 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-800">
-              Trazabilidad de expedientes
+  // COLOR ESTADO
+  const obtenerColorEstado = (estado) => {
+
+    switch (estado) {
+
+      case "Despacho":
+        return "bg-yellow-100 text-yellow-700";
+
+      case "Comisión":
+        return "bg-purple-100 text-purple-700";
+
+      case "Ingresado":
+        return "bg-blue-100 text-blue-700";
+
+      case "Aprobado":
+        return "bg-green-100 text-green-700";
+
+      case "Rechazado":
+        return "bg-red-100 text-red-700";
+
+      default:
+        return "bg-gray-100 text-gray-700";
+    }
+  };
+
+  // TRAZABILIDAD AUTOMÁTICA
+  const generarEventos = (exp) => {
+
+    if (!exp) return [];
+
+    const eventos = [
+      {
+        titulo: "Expediente creado",
+        descripcion:
+          "Mesa de entrada registró el expediente",
+        fecha: exp.fecha_creacion,
+      },
+    ];
+
+    // comisión
+    if (exp.comision) {
+      eventos.push({
+        titulo: `Asignado a comisión ${exp.comision}`,
+        descripcion:
+          "Expediente enviado para análisis",
+        fecha: exp.fecha_ingreso,
+      });
+    }
+
+    // estado
+    eventos.push({
+      titulo: `Estado actual: ${exp.estado}`,
+      descripcion:
+        "Seguimiento actualizado automáticamente",
+      fecha: exp.fecha_ingreso,
+    });
+
+    return eventos;
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100 flex">
+
+      {/* SIDEBAR */}
+      <NavbarLateral user={{ role: "admin" }} />
+
+      {/* MAIN */}
+      <main className="flex-1 ml-64 p-8">
+
+        <div className="max-w-7xl mx-auto">
+
+          {/* HEADER */}
+          <div className="mb-8">
+
+            <h1 className="text-4xl font-bold text-gray-900">
+              Trazabilidad
             </h1>
 
-            <p className="text-slate-500 mt-1">
-              Seguimiento completo del estado y recorrido de los expedientes
+            <p className="text-gray-500 mt-2">
+              Seguimiento de expedientes del consejo directivo
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-3">
-            <button className="flex items-center gap-2 border border-slate-300 px-4 py-2 rounded-xl hover:bg-slate-100 transition">
-              <Bell size={18} />
-              Notificar reunión
-            </button>
+          {/* GRID */}
+          <div className="grid grid-cols-12 gap-6">
 
-            <button className="flex items-center gap-2 bg-blue-700 text-white px-4 py-2 rounded-xl hover:bg-blue-800 transition">
-              <Plus size={18} />
-              Nuevo expediente
-            </button>
-          </div>
-        </div>
+            {/* PANEL IZQUIERDO */}
+            <div className="col-span-12 lg:col-span-4">
 
-        {/* Content */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mt-6">
-          {/* Left Panel */}
-          <div className="xl:col-span-1 bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-xl font-semibold text-slate-800">
-                Expedientes
-              </h2>
+              <div className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden">
 
-              <button
-                onClick={() => navigate("/ExpedienteTodos")}
-                className="text-blue-700 font-medium flex items-center gap-1 hover:underline"
-              >
-                Ver todos
-                <ArrowUpRight size={16} />
-              </button>
-            </div>
+                {/* HEADER */}
+                <div className="flex items-center justify-between p-6 border-b border-gray-100">
 
-            <div className="space-y-3">
-              {expedientesMock.map((exp) => (
-                <button
-                  key={exp.id}
-                  onClick={() => setExpedienteSeleccionado(exp)}
-                  className={`w-full text-left p-4 rounded-xl border transition ${
-                    expedienteSeleccionado.id === exp.id
-                      ? "bg-blue-50 border-blue-500"
-                      : "bg-white border-slate-200 hover:bg-slate-50"
-                  }`}
-                >
-                  <div className="font-semibold text-slate-800">
-                    {exp.codigo}
+                  <div>
+                    <h2 className="text-3xl font-bold text-gray-900">
+                      Expedientes
+                    </h2>
                   </div>
 
-                  <div className="text-slate-600 text-sm mt-1">
-                    {exp.titulo}
-                  </div>
-
-                  <span
-                    className={`inline-block mt-3 text-xs px-3 py-1 rounded-full font-medium ${
-                      exp.estado === "Finalizado"
-                        ? "bg-green-100 text-green-700"
-                        : exp.estado === "Pendiente"
-                        ? "bg-yellow-100 text-yellow-700"
-                        : "bg-blue-100 text-blue-700"
-                    }`}
+                  <button
+                    onClick={() =>
+                      navigate("/Expediente")
+                    }
+                    className="text-blue-600 font-semibold flex items-center gap-1 hover:text-blue-800"
                   >
-                    {exp.estado}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
+                    Ver todos
+                    <ArrowUpRight size={16} />
+                  </button>
+                </div>
 
-          {/* Right Panel */}
-          <div className="xl:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-            {/* Select */}
-            <div className="flex flex-col md:flex-row gap-4 mb-6">
-              <select
-                value={expedienteSeleccionado.id}
-                onChange={(e) => {
-                  const expediente = expedientesMock.find(
-                    (exp) => exp.id === Number(e.target.value)
-                  );
+                {/* LISTA */}
+                <div className="max-h-[700px] overflow-y-auto">
 
-                  setExpedienteSeleccionado(expediente);
-                }}
-                className="w-full md:w-[450px] border border-slate-300 rounded-xl px-4 py-3 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                {expedientesMock.map((exp) => (
-                  <option key={exp.id} value={exp.id}>
-                    {exp.codigo} — {exp.titulo}
-                  </option>
-                ))}
-              </select>
+                  {expedientes.map((exp) => (
 
-              <button
-                onClick={() => navigate("/expedientes-todos")}
-                className="border border-slate-300 px-4 py-3 rounded-xl hover:bg-slate-100 transition flex items-center justify-center gap-2"
-              >
-                Ver todos
-                <ArrowUpRight size={16} />
-              </button>
-            </div>
+                    <button
+                      key={exp._id}
+                      onClick={() =>
+                        setExpedienteSeleccionado(exp)
+                      }
+                      className={`
+                        w-full
+                        text-left
+                        p-6
+                        border-b
+                        border-gray-100
+                        transition
+                        hover:bg-gray-50
+                        ${
+                          expedienteSeleccionado?._id === exp._id
+                            ? "bg-blue-50"
+                            : "bg-white"
+                        }
+                      `}
+                    >
 
-            {/* Header expediente */}
-            <div className="border-b border-slate-200 pb-5 mb-6">
-              <h2 className="text-2xl font-bold text-slate-800">
-                {expedienteSeleccionado.codigo}
-              </h2>
+                      <h3 className="font-bold text-xl text-gray-900">
+                        {exp.numero}
+                      </h3>
 
-              <p className="text-slate-500 mt-1">
-                {expedienteSeleccionado.titulo}
-              </p>
-            </div>
+                      <p className="text-gray-600 mt-2">
+                        {exp.descripcion}
+                      </p>
 
-            {/* Timeline */}
-            <div className="relative">
-              {/* Línea vertical */}
-              <div className="absolute left-[15px] top-0 h-full w-[2px] bg-slate-200"></div>
-
-              <div className="space-y-8">
-                {expedienteSeleccionado.timeline.map((item, index) => (
-                  <div key={index} className="relative flex gap-5">
-                    {/* Icon */}
-                    <div className="relative z-10 w-8 h-8 rounded-full bg-blue-700 text-white flex items-center justify-center shadow">
-                      {renderIcon(item.icon)}
-                    </div>
-
-                    {/* Card */}
-                    <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 w-full hover:shadow-sm transition">
-                      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                        <h3 className="font-semibold text-slate-800">
-                          {item.titulo}
-                        </h3>
-
-                        <span className="text-sm text-slate-500">
-                          {item.fecha}
+                      <div className="mt-4">
+                        <span className={`
+                          px-4
+                          py-1
+                          rounded-full
+                          text-sm
+                          font-semibold
+                          ${obtenerColorEstado(exp.estado)}
+                        `}>
+                          {exp.estado}
                         </span>
                       </div>
+                    </button>
+                  ))}
 
-                      <p className="text-slate-600 mt-2">
-                        {item.descripcion}
-                      </p>
-                    </div>
+                </div>
+              </div>
+            </div>
+
+            {/* PANEL DERECHO */}
+            <div className="col-span-12 lg:col-span-8">
+
+              <div className="bg-white rounded-3xl shadow-sm border border-gray-200 p-6">
+
+                {/* SELECT */}
+                <div className="flex flex-col lg:flex-row gap-4 justify-between mb-8">
+
+                  <div className="relative w-full">
+
+                    <select
+                      value={expedienteSeleccionado?._id || ""}
+                      onChange={(e) => {
+
+                        const encontrado =
+                          expedientes.find(
+                            (exp) =>
+                              exp._id === e.target.value
+                          );
+
+                        setExpedienteSeleccionado(
+                          encontrado
+                        );
+                      }}
+                      className="
+                        w-full
+                        border
+                        border-gray-200
+                        rounded-2xl
+                        px-5
+                        py-4
+                        appearance-none
+                        outline-none
+                        bg-white
+                        text-gray-700
+                      "
+                    >
+
+                      {expedientes.map((exp) => (
+                        <option
+                          key={exp._id}
+                          value={exp._id}
+                        >
+                          {exp.numero} — {exp.descripcion}
+                        </option>
+                      ))}
+                    </select>
+
+                    <ChevronDown
+                      size={18}
+                      className="
+                        absolute
+                        right-5
+                        top-1/2
+                        -translate-y-1/2
+                        text-gray-500
+                      "
+                    />
                   </div>
-                ))}
+
+                  <button
+                    onClick={() =>
+                      navigate("/Expediente")
+                    }
+                    className="
+                      px-6
+                      py-4
+                      border
+                      border-gray-200
+                      rounded-2xl
+                      hover:bg-gray-50
+                      transition
+                      whitespace-nowrap
+                    "
+                  >
+                    Ver todos ↗
+                  </button>
+                </div>
+
+                {/* INFO */}
+                {expedienteSeleccionado && (
+
+                  <>
+                    <h2 className="text-5xl font-bold text-gray-900">
+                      {expedienteSeleccionado.numero}
+                    </h2>
+
+                    <p className="text-2xl text-gray-600 mt-3 mb-10">
+                      {expedienteSeleccionado.descripcion}
+                    </p>
+
+                    {/* TIMELINE */}
+                    <div className="relative">
+
+                      {/* LINEA */}
+                      <div className="
+                        absolute
+                        left-5
+                        top-0
+                        bottom-0
+                        w-[2px]
+                        bg-gray-200
+                      " />
+
+                      <div className="space-y-8">
+
+                        {generarEventos(
+                          expedienteSeleccionado
+                        ).map((evento, index) => (
+
+                          <div
+                            key={index}
+                            className="relative flex gap-6"
+                          >
+
+                            {/* ICONO */}
+                            <div className="
+                              z-10
+                              w-10
+                              h-10
+                              rounded-full
+                              bg-blue-600
+                              flex
+                              items-center
+                              justify-center
+                              text-white
+                              shadow-lg
+                            ">
+                              <Clock3 size={18} />
+                            </div>
+
+                            {/* CARD */}
+                            <div className="
+                              flex-1
+                              bg-gray-50
+                              border
+                              border-gray-200
+                              rounded-3xl
+                              p-8
+                            ">
+
+                              <div className="flex items-start justify-between gap-4">
+
+                                <div>
+
+                                  <h3 className="text-2xl font-bold text-gray-900">
+                                    {evento.titulo}
+                                  </h3>
+
+                                  <p className="text-gray-600 mt-4 text-lg">
+                                    {evento.descripcion}
+                                  </p>
+                                </div>
+
+                                <div className="
+                                  flex
+                                  items-center
+                                  gap-2
+                                  text-gray-500
+                                  whitespace-nowrap
+                                ">
+                                  <CalendarDays size={16} />
+
+                                  <span>
+                                    {evento.fecha}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+
+                      </div>
+                    </div>
+                  </>
+                )}
+
               </div>
             </div>
           </div>
@@ -285,6 +398,4 @@ const Trazabilidad = () => {
       </main>
     </div>
   );
-};
-
-export default Trazabilidad;
+}
