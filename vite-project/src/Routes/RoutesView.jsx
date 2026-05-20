@@ -1,8 +1,6 @@
 import React from 'react'
 import { Route, Routes } from 'react-router-dom'
 import Home from '../Pages/Home'
-import IniciarSesion from '../Pages/IniciarSesion'
-import Registrarse from '../Pages/Registrarse'
 import Drive from '../Pages/Drive'
 import Reportes from '../Pages/Reportes'
 import OlvidarContrasenia from '../Pages/OlvidarContrasenia'
@@ -23,15 +21,23 @@ import Expedientes from '../Pages/Expediente'
 import Expediente from '../Pages/Expediente'
 import NuevoExpediente from '../Pages/NuevoExpediente'
 import ExpedienteTodos from '../Pages/ExpedienteTodos'
-import OrdenDelDia from '../Pages/OrdenDelDia'
 import Notificacion from '../Pages/Notificacion'
+import Dashboard from '../Pages/Dashboard'
+import Login from '../Pages/Login'
+import Registro from '../Pages/Registro'
+import EditarExpediente from '../Pages/EditarExpediente'
+import NuevaReunion from '../Pages/NuevaReunion'
+import EditarReunion from '../Pages/EditarReunion'
+import TemarioProvisorio from '../Pages/TemarioProvisorio'
+import NuevaActa from '../Pages/NuevaActa'
+import EditarActa from '../Pages/EditarActa'
 
 const RoutesView = () => {
   return (
     <Routes>
         <Route path='/' element={<Home/>}/>
-        <Route path='/IniciarSesion' element={<IniciarSesion/>}/>
-        <Route path='/Registrarse' element={<Registrarse/>}/>
+        <Route path='/Login' element={<Login/>}/>
+        <Route path='/Registro' element={<Registro/>}/>
         <Route path='/Drive' element={<Drive/>}/>
         <Route path='/Reportes' element={<Reportes/>}/>
         <Route path='/OlvidarContrasenia' element={<OlvidarContrasenia/>}/>
@@ -51,8 +57,14 @@ const RoutesView = () => {
         <Route path='/Expediente' element={<Expediente/>}/>
         <Route path='/NuevoExpediente' element={<NuevoExpediente/>}/>
         <Route path='/ExpedienteTodos' element={<ExpedienteTodos/>}/>
-        <Route path='/OrdenDelDia' element={<OrdenDelDia/>}/>
+        <Route path='/TemarioProvisorio' element={<TemarioProvisorio/>}/>
         <Route path='/Notificacion' element={<Notificacion/>}/>
+        <Route path='/Dashboard' element={<Dashboard/>}/>
+        <Route path='/EditarExpediente/:id' element={<EditarExpediente/>}/>
+        <Route path='/NuevaReunion' element={<NuevaReunion/>}/>
+        <Route path='/EditarReunion/:id' element={<EditarReunion/>}/>
+        <Route path='/NuevaActa' element={<NuevaActa/>}/>
+        <Route path='/EditarActa/:id' element={<EditarActa/>}/>
 
     </Routes>
   )

@@ -131,29 +131,17 @@ const Disposicion = () => {
             <table className="w-full border-collapse">
               <thead>
                 <tr className="border-b border-slate-200 text-slate-500 text-sm">
-                  <th className="text-left py-4">
-                    Nº disposición
-                  </th>
+                  <th className="text-left py-4">Nº disposición</th>
 
-                  <th className="text-left py-4">
-                    Tipo
-                  </th>
+                  <th className="text-left py-4">Tipo</th>
 
-                  <th className="text-left py-4">
-                    Descripción
-                  </th>
+                  <th className="text-left py-4">Descripción</th>
 
-                  <th className="text-left py-4">
-                    Fecha
-                  </th>
+                  <th className="text-left py-4">Fecha</th>
 
-                  <th className="text-left py-4">
-                    Estado
-                  </th>
+                  <th className="text-left py-4">Estado</th>
 
-                  <th className="text-left py-4">
-                    Acciones
-                  </th>
+                  <th className="text-left py-4">Acciones</th>
                 </tr>
               </thead>
 
@@ -173,13 +161,9 @@ const Disposicion = () => {
                       </span>
                     </td>
 
-                    <td className="py-5 text-slate-600">
-                      {disp.descripcion}
-                    </td>
+                    <td className="py-5 text-slate-600">{disp.descripcion}</td>
 
-                    <td className="py-5 text-slate-600">
-                      {disp.fecha}
-                    </td>
+                    <td className="py-5 text-slate-600">{disp.fecha}</td>
 
                     <td className="py-5">
                       <EstadoBadge estado={disp.estado} />
@@ -192,10 +176,15 @@ const Disposicion = () => {
                         </button>
 
                         <button className="p-2 rounded-lg border border-slate-300 hover:bg-slate-100 transition">
-                          <Pencil
-                            size={18}
-                            className="text-slate-700"
-                          />
+                          <Pencil size={18} className="text-slate-700" />
+                        </button>
+                        <button
+                          onClick={() =>
+                            navigate(`/editar-expediente/${exp.numero}`)
+                          }
+                          className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700 hover:bg-blue-100 transition"
+                        >
+                          Drive
                         </button>
                       </div>
                     </td>
@@ -214,13 +203,9 @@ const CardResumen = ({ titulo, valor, icon }) => {
   return (
     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex items-center justify-between hover:shadow-md transition">
       <div>
-        <p className="text-slate-500 text-sm">
-          {titulo}
-        </p>
+        <p className="text-slate-500 text-sm">{titulo}</p>
 
-        <h3 className="text-3xl font-bold text-slate-800 mt-2">
-          {valor}
-        </h3>
+        <h3 className="text-3xl font-bold text-slate-800 mt-2">{valor}</h3>
       </div>
 
       <div className="w-14 h-14 rounded-2xl bg-blue-100 flex items-center justify-center text-blue-700">
@@ -232,14 +217,11 @@ const CardResumen = ({ titulo, valor, icon }) => {
 
 const EstadoBadge = ({ estado }) => {
   const colores = {
-    Aprobada:
-      "bg-green-100 text-green-700",
+    Aprobada: "bg-green-100 text-green-700",
 
-    Pendiente:
-      "bg-yellow-100 text-yellow-700",
+    Pendiente: "bg-yellow-100 text-yellow-700",
 
-    "En revisión":
-      "bg-blue-100 text-blue-700",
+    "En revisión": "bg-blue-100 text-blue-700",
   };
 
   return (

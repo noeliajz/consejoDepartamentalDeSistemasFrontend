@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+import axios from "axios";
 
 import {
   Search,
@@ -11,17 +13,24 @@ import {
 import NavbarLateral from "../components/NavbarLateral";
 
 export default function Expediente() {
+
   const navigate = useNavigate();
 
+  // EXPEDIENTES DESDE MONGODB
+  const [expedientes, setExpedientes] = useState([]);
+
+  // FILTROS
   const [estadoSeleccionado, setEstadoSeleccionado] =
-    useState("Rechazado");
+    useState("Todos los estados");
 
   const [categoriaSeleccionada, setCategoriaSeleccionada] =
-    useState("Otros");
+    useState("Todas las categorías");
 
   const [openEstado, setOpenEstado] = useState(false);
 
   const [openCategoria, setOpenCategoria] = useState(false);
+
+  const [busqueda, setBusqueda] = useState("");
 
   const estados = [
     "Todos los estados",
@@ -35,73 +44,130 @@ export default function Expediente() {
   const categorias = [
     "Todas las categorías",
     "Docentes",
-    "Estudiantes",
+    "Alumnos",
     "Otros",
   ];
 
-  const expedientes = [
-    {
-      numero: "EXP-2025-047",
-      descripcion: "Beca comedor — docente Pérez",
-      categoria: "Docentes",
-      ingreso: "02/05/25",
-      estado: "Despacho",
-      color: "bg-yellow-100 text-yellow-800",
-    },
-    {
-      numero: "EXP-2025-046",
-      descripcion: "Designación cargo auxiliar informática",
-      categoria: "Docentes",
-      ingreso: "30/04/25",
-      estado: "Comisión",
-      color: "bg-purple-100 text-purple-700",
-    },
-    {
-      numero: "EXP-2025-044",
-      descripcion: "Reconocimiento actividad extensión Gómez",
-      categoria: "Otros",
-      ingreso: "28/04/25",
-      estado: "Ingresado",
-      color: "bg-blue-100 text-blue-700",
-    },
-    {
-      numero: "EXP-2025-043",
-      descripcion: "Impugnación concurso docente área 3",
-      categoria: "Docentes",
-      ingreso: "25/04/25",
-      estado: "Rechazado",
-      color: "bg-red-100 text-red-700",
-    },
-    {
-      numero: "EXP-2025-041",
-      descripcion: "Cambio correlativas — estudiantes",
-      categoria: "Estudiantes",
-      ingreso: "20/04/25",
-      estado: "Aprobado",
-      color: "bg-green-100 text-green-700",
-    },
-  ];
+  // OBTENER EXPEDIENTES
+  const obtenerExpedientes = async () => {
+    try {
+
+      const response = await axios.get(
+        "http://127.0.0.1:5000/api/expedientes"
+      );
+
+      setExpedientes(response.data);
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert("Error al obtener expedientes");
+    }
+  };
+
+  // ELIMINAR
+  const eliminarExpediente = async (id) => {
+    try {
+
+      const confirmar = window.confirm(
+        "¿Deseas eliminar este expediente?"
+      );
+
+      if (!confirmar) return;
+
+      await axios.delete(
+        `http://127.0.0.1:5000/api/expedientes/${id}`
+      );
+
+      alert("Expediente eliminado");
+
+      obtenerExpedientes();
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert("Error al eliminar expediente");
+    }
+  };
+
+  // CARGAR AL INICIAR
+  useEffect(() => {
+    obtenerExpedientes();
+  }, []);
+
+  // COLOR ESTADO
+  const obtenerColorEstado = (estado) => {
+
+    switch (estado) {
+
+      case "Despacho":
+        return "bg-yellow-100 text-yellow-800";
+
+      case "Comisión":
+        return "bg-purple-100 text-purple-700";
+
+      case "Ingresado":
+        return "bg-blue-100 text-blue-700";
+
+      case "Aprobado":
+        return "bg-green-100 text-green-700";
+
+      case "Rechazado":
+        return "bg-red-100 text-red-700";
+
+      default:
+        return "bg-gray-100 text-gray-700";
+    }
+  };
+
+  // FILTROS
+  const expedientesFiltrados = expedientes.filter((exp) => {
+
+    const coincideBusqueda =
+      exp.numero?.toLowerCase().includes(busqueda.toLowerCase()) ||
+      exp.descripcion?.toLowerCase().includes(busqueda.toLowerCase());
+
+    const coincideEstado =
+      estadoSeleccionado === "Todos los estados" ||
+      exp.estado === estadoSeleccionado;
+
+    const coincideCategoria =
+      categoriaSeleccionada === "Todas las categorías" ||
+      exp.categoria === categoriaSeleccionada;
+
+    return (
+      coincideBusqueda &&
+      coincideEstado &&
+      coincideCategoria
+    );
+  });
 
   return (
     <div className="min-h-screen bg-gray-100 flex">
+
       {/* Sidebar */}
       <NavbarLateral user={{ role: "admin" }} />
 
       {/* Main */}
       <main className="flex-1 ml-64 p-8">
+
         {/* Header */}
         <div className="flex items-start justify-between mb-10">
+
           <div>
             <h1 className="text-4xl font-bold text-gray-900 mb-2">
               Expedientes
             </h1>
 
             <p className="text-gray-500">
-              Gestión y seguimiento de expedientes del consejo directivo
+              Gestión y seguimiento de expedientes
             </p>
           </div>
 
           <div className="flex items-center gap-6">
+
             <button className="relative text-gray-700 hover:text-black transition">
               <Bell size={22} />
 
@@ -109,8 +175,23 @@ export default function Expediente() {
             </button>
 
             <button
-              onClick={() => navigate("/NuevoExpediente")}
-              className="bg-blue-900 hover:bg-blue-800 transition text-white px-5 py-3 rounded-xl font-medium flex items-center gap-2 shadow"
+              onClick={() =>
+                navigate("/NuevoExpediente")
+              }
+              className="
+                bg-blue-900
+                hover:bg-blue-800
+                transition
+                text-white
+                px-5
+                py-3
+                rounded-xl
+                font-medium
+                flex
+                items-center
+                gap-2
+                shadow
+              "
             >
               Nuevo expediente
               <Plus size={18} />
@@ -118,33 +199,73 @@ export default function Expediente() {
           </div>
         </div>
 
-        {/* Filters */}
+        {/* FILTROS */}
         <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-6 mb-8">
+
           <div className="flex flex-col lg:flex-row gap-4 lg:items-center lg:justify-between">
-            {/* Search */}
+
+            {/* BUSCAR */}
             <div className="relative w-full lg:max-w-sm">
+
               <Search
                 size={18}
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                className="
+                  absolute
+                  left-4
+                  top-1/2
+                  -translate-y-1/2
+                  text-gray-400
+                "
               />
 
               <input
                 type="text"
                 placeholder="Buscar expediente..."
-                className="w-full rounded-xl border border-gray-200 bg-gray-50 py-3 pl-11 pr-4 outline-none focus:ring-2 focus:ring-blue-200"
+                value={busqueda}
+                onChange={(e) =>
+                  setBusqueda(e.target.value)
+                }
+                className="
+                  w-full
+                  rounded-xl
+                  border
+                  border-gray-200
+                  bg-gray-50
+                  py-3
+                  pl-11
+                  pr-4
+                  outline-none
+                  focus:ring-2
+                  focus:ring-blue-200
+                "
               />
             </div>
 
-            {/* Filters */}
+            {/* DROPDOWNS */}
             <div className="flex flex-wrap gap-4">
-              {/* Dropdown Estado */}
+
+              {/* ESTADO */}
               <div className="relative">
+
                 <button
                   onClick={() => {
                     setOpenEstado(!openEstado);
                     setOpenCategoria(false);
                   }}
-                  className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm hover:bg-gray-50 min-w-[170px] justify-between"
+                  className="
+                    flex
+                    items-center
+                    gap-2
+                    rounded-xl
+                    border
+                    border-gray-200
+                    bg-white
+                    px-4
+                    py-3
+                    text-sm
+                    min-w-[170px]
+                    justify-between
+                  "
                 >
                   {estadoSeleccionado}
 
@@ -152,7 +273,21 @@ export default function Expediente() {
                 </button>
 
                 {openEstado && (
-                  <div className="absolute top-full left-0 mt-2 w-full rounded-xl border border-gray-200 bg-white shadow-lg overflow-hidden z-50">
+                  <div className="
+                    absolute
+                    top-full
+                    left-0
+                    mt-2
+                    w-full
+                    rounded-xl
+                    border
+                    border-gray-200
+                    bg-white
+                    shadow-lg
+                    overflow-hidden
+                    z-50
+                  ">
+
                     {estados.map((estado) => (
                       <button
                         key={estado}
@@ -160,11 +295,21 @@ export default function Expediente() {
                           setEstadoSeleccionado(estado);
                           setOpenEstado(false);
                         }}
-                        className={`w-full text-left px-4 py-3 text-sm hover:bg-blue-600 hover:text-white transition ${
-                          estadoSeleccionado === estado
-                            ? "bg-blue-600 text-white"
-                            : ""
-                        }`}
+                        className={`
+                          w-full
+                          text-left
+                          px-4
+                          py-3
+                          text-sm
+                          hover:bg-blue-600
+                          hover:text-white
+                          transition
+                          ${
+                            estadoSeleccionado === estado
+                              ? "bg-blue-600 text-white"
+                              : ""
+                          }
+                        `}
                       >
                         {estado}
                       </button>
@@ -173,14 +318,28 @@ export default function Expediente() {
                 )}
               </div>
 
-              {/* Dropdown Categoria */}
+              {/* CATEGORIA */}
               <div className="relative">
+
                 <button
                   onClick={() => {
                     setOpenCategoria(!openCategoria);
                     setOpenEstado(false);
                   }}
-                  className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm hover:bg-gray-50 min-w-[170px] justify-between"
+                  className="
+                    flex
+                    items-center
+                    gap-2
+                    rounded-xl
+                    border
+                    border-gray-200
+                    bg-white
+                    px-4
+                    py-3
+                    text-sm
+                    min-w-[170px]
+                    justify-between
+                  "
                 >
                   {categoriaSeleccionada}
 
@@ -188,7 +347,21 @@ export default function Expediente() {
                 </button>
 
                 {openCategoria && (
-                  <div className="absolute top-full left-0 mt-2 w-full rounded-xl border border-gray-200 bg-white shadow-lg overflow-hidden z-50">
+                  <div className="
+                    absolute
+                    top-full
+                    left-0
+                    mt-2
+                    w-full
+                    rounded-xl
+                    border
+                    border-gray-200
+                    bg-white
+                    shadow-lg
+                    overflow-hidden
+                    z-50
+                  ">
+
                     {categorias.map((categoria) => (
                       <button
                         key={categoria}
@@ -196,11 +369,21 @@ export default function Expediente() {
                           setCategoriaSeleccionada(categoria);
                           setOpenCategoria(false);
                         }}
-                        className={`w-full text-left px-4 py-3 text-sm hover:bg-blue-600 hover:text-white transition ${
-                          categoriaSeleccionada === categoria
-                            ? "bg-blue-600 text-white"
-                            : ""
-                        }`}
+                        className={`
+                          w-full
+                          text-left
+                          px-4
+                          py-3
+                          text-sm
+                          hover:bg-blue-600
+                          hover:text-white
+                          transition
+                          ${
+                            categoriaSeleccionada === categoria
+                              ? "bg-blue-600 text-white"
+                              : ""
+                          }
+                        `}
                       >
                         {categoria}
                       </button>
@@ -208,44 +391,79 @@ export default function Expediente() {
                   </div>
                 )}
               </div>
-
-              {/* Nuevo */}
-              <button
-                onClick={() => navigate("/NuevoExpediente")}
-                className="bg-blue-900 hover:bg-blue-800 transition text-white px-5 py-3 rounded-xl font-medium flex items-center gap-2"
-              >
-                Nuevo
-                <Plus size={16} />
-              </button>
             </div>
           </div>
         </div>
 
-        {/* Table */}
-        <div className="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden">
-          {/* Header */}
-          <div className="grid grid-cols-12 gap-4 px-8 py-5 border-b border-gray-100 text-sm font-semibold text-gray-500 uppercase tracking-wide">
-            <div className="col-span-2">N° expediente</div>
+        {/* TABLA */}
+        <div className="
+          bg-white
+          rounded-3xl
+          border
+          border-gray-200
+          shadow-sm
+          overflow-hidden
+        ">
 
-            <div className="col-span-4">Descripción</div>
+          {/* HEADER */}
+          <div className="
+            grid
+            grid-cols-12
+            gap-4
+            px-8
+            py-5
+            border-b
+            border-gray-100
+            text-sm
+            font-semibold
+            text-gray-500
+            uppercase
+          ">
 
-            <div className="col-span-1">Categoría</div>
+            <div className="col-span-2">
+              N° expediente
+            </div>
 
-            <div className="col-span-1">Ingreso</div>
+            <div className="col-span-4">
+              Descripción
+            </div>
 
-            <div className="col-span-2">Estado</div>
+            <div className="col-span-1">
+              Categoría
+            </div>
+
+            <div className="col-span-1">
+              Ingreso
+            </div>
+
+            <div className="col-span-2">
+              Estado
+            </div>
 
             <div className="col-span-2 text-center">
               Acciones
             </div>
           </div>
 
-          {/* Rows */}
-          {expedientes.map((exp, index) => (
+          {/* FILAS */}
+          {expedientesFiltrados.map((exp) => (
+
             <div
-              key={index}
-              className="grid grid-cols-12 gap-4 px-8 py-5 items-center border-b border-gray-100 hover:bg-gray-50 transition"
+              key={exp._id}
+              className="
+                grid
+                grid-cols-12
+                gap-4
+                px-8
+                py-5
+                items-center
+                border-b
+                border-gray-100
+                hover:bg-gray-50
+                transition
+              "
             >
+
               <div className="col-span-2 font-medium text-gray-800">
                 {exp.numero}
               </div>
@@ -255,56 +473,113 @@ export default function Expediente() {
               </div>
 
               <div className="col-span-1">
-                <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">
+                <span className="
+                  rounded-full
+                  bg-gray-100
+                  px-3
+                  py-1
+                  text-xs
+                  font-medium
+                  text-gray-700
+                ">
                   {exp.categoria}
                 </span>
               </div>
 
               <div className="col-span-1 text-gray-600">
-                {exp.ingreso}
+                {exp.fecha_ingreso}
               </div>
 
               <div className="col-span-2">
-                <span
-                  className={`rounded-full px-3 py-1 text-xs font-semibold ${exp.color}`}
-                >
+
+                <span className={`
+                  rounded-full
+                  px-3
+                  py-1
+                  text-xs
+                  font-semibold
+                  ${obtenerColorEstado(exp.estado)}
+                `}>
                   {exp.estado}
                 </span>
               </div>
 
-              {/* Acciones */}
-              <div className="col-span-2 flex items-center justify-center gap-2">
-                {/* Editar */}
+              {/* ACCIONES */}
+              <div className="
+                col-span-2
+                flex
+                items-center
+                justify-center
+                gap-2
+              ">
+
+                {/* VER */}
                 <button
                   onClick={() =>
-                    navigate(`/editar-expediente/${exp.numero}`)
+                    navigate(`/expediente/${exp._id}`)
                   }
-                  className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700 hover:bg-blue-100 transition"
+                  className="
+                    rounded-lg
+                    border
+                    border-gray-200
+                    bg-gray-50
+                    px-3
+                    py-2
+                    text-xs
+                    font-semibold
+                    text-gray-700
+                    hover:bg-gray-100
+                  "
+                >
+                  Ver
+                </button>
+
+                {/* EDITAR */}
+                <button
+                  onClick={() =>
+                    navigate(`/EditarExpediente/${exp._id}`)
+                  }
+                  className="
+                    rounded-lg
+                    border
+                    border-blue-200
+                    bg-blue-50
+                    px-3
+                    py-2
+                    text-xs
+                    font-semibold
+                    text-blue-700
+                    hover:bg-blue-100
+                  "
                 >
                   Editar
                 </button>
 
-                {/* Eliminar */}
+                {/* ELIMINAR */}
                 <button
-                  onClick={() => {
-                    if (
-                      window.confirm(
-                        `¿Deseas eliminar el expediente ${exp.numero}?`
-                      )
-                    ) {
-                      console.log(
-                        "Eliminar expediente:",
-                        exp.numero
-                      );
-                    }
-                  }}
-                  className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 hover:bg-red-100 transition"
+                  onClick={() =>
+                    eliminarExpediente(exp._id)
+                  }
+                  className="
+                    rounded-lg
+                    border
+                    border-red-200
+                    bg-red-50
+                    px-3
+                    py-2
+                    text-xs
+                    font-semibold
+                    text-red-700
+                    hover:bg-red-100
+                  "
                 >
                   Eliminar
                 </button>
+
               </div>
             </div>
           ))}
+
         </div>
       </main>
     </div>

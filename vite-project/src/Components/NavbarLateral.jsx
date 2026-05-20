@@ -12,6 +12,8 @@ import {
   LogIn,
   UserPlus,
   BarChart3,
+  HardDrive, // 👈 agregado
+  Cloud, // 👈 agregado
 } from "lucide-react";
 
 import logo from "../assets/logo.png";
@@ -19,7 +21,7 @@ import logo from "../assets/logo.png";
 const NavbarLateral = ({ user }) => {
   return (
     <aside className="w-64 h-screen bg-blue-900 text-white fixed left-0 top-0 flex flex-col">
-
+      
       {/* Header */}
       <div className="p-5 border-b border-blue-800">
         <img src={logo} alt="logo" className="w-8 h-8 mb-3" />
@@ -39,13 +41,13 @@ const NavbarLateral = ({ user }) => {
         {!user && (
           <>
             <MenuItem
-              to="/login"
+              to="/Login"
               icon={<LogIn size={18} />}
               text="Iniciar sesión"
             />
 
             <MenuItem
-              to="/registro"
+              to="/Registro"
               icon={<UserPlus size={18} />}
               text="Registrarse"
             />
@@ -55,7 +57,7 @@ const NavbarLateral = ({ user }) => {
         {user?.role === "admin" && (
           <>
             <MenuItem
-              to="/dashboard"
+              to="/Dashboard"
               icon={<LayoutDashboard size={18} />}
               text="Dashboard"
             />
@@ -79,9 +81,9 @@ const NavbarLateral = ({ user }) => {
             />
 
             <MenuItem
-              to="/OrdenDelDia"
+              to="/TemarioProvisorio"
               icon={<Vote size={18} />}
-              text="Orden del día"
+              text="Temario Provisorio"
             />
 
             <MenuItem
@@ -131,6 +133,20 @@ const NavbarLateral = ({ user }) => {
               to="/Notificacion"
               icon={<Users size={18} />}
               text="Notificaciones"
+            />
+
+            {/* 👇 NUEVO DRIVE */}
+            <MenuItem
+              to="/PythonDrive"
+              icon={<HardDrive size={18} />}
+              text="Drive"
+            />
+
+            {/* 👇 NUEVO DRIVE2 */}
+            <MenuItem
+              to="/GoogleDocsDrive"
+              icon={<Cloud size={18} />}
+              text="Drive2 / GoogleDocs"
             />
           </>
         )}
