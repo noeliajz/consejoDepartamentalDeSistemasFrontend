@@ -105,99 +105,108 @@ const Acta = () => {
       }
     };
 
-  // GENERAR PDF
-  const generarPDF =
-    (acta) => {
 
-      const doc =
-        new jsPDF();
+    // GENERAR PDF
+const generarPDF = async (acta) => {
+  const doc = new jsPDF();
+  const marginLeft = 20;
+  let y = 20;
 
-      doc.setFontSize(20);
+  // DEBUG — quitalo después de confirmar que funciona
+  console.log("acta.temas recibidos:", acta.temas);
 
-      doc.text(
-        "ACTA DE REUNIÓN",
-        20,
-        20
-      );
+  // ===== TÍTULO =====
+  doc.setFont("times", "bold");
+  doc.setFontSize(18);
+  doc.text("ACTA DE REUNIÓN", 105, y, { align: "center" });
+  y += 10;
+  doc.setLineWidth(0.5);
+  doc.line(20, y, 190, y);
+  y += 15;
 
-      doc.setFontSize(12);
+  // ===== DATOS =====
+  doc.setFont("times", "normal");
+  doc.setFontSize(12);
+  doc.text(`Fecha: ${acta.fecha || "-"}`, marginLeft, y);
+  y += 10;
+  doc.text(`Estado: ${acta.estado || "-"}`, marginLeft, y);
+  y += 10;
+  doc.text(`Cantidad de Consejeros: ${acta.consejeros || 0}`, marginLeft, y);
+  y += 15;
 
-      doc.text(
-        `Fecha de ingreso: ${acta.fecha || "-"}`,
-        20,
-        40
-      );
+  // ===== DESCRIPCIÓN =====
+  doc.setFont("times", "bold");
+  doc.text("Descripción:", marginLeft, y);
+  y += 8;
+  doc.setFont("times", "normal");
+  const descripcion = doc.splitTextToSize(acta.descripcion || "Sin descripción", 170);
+  doc.text(descripcion, marginLeft, y);
+  y += descripcion.length * 7 + 15;
 
-      doc.text(
-        `Cantidad de consejeros: ${acta.consejeros || 0}`,
-        20,
-        50
-      );
+  // ===== TEMAS =====
+  doc.setFont("times", "bold");
+  doc.text("Temas Tratados:", marginLeft, y);
+  y += 10;
+  doc.setFont("times", "normal");
 
-      doc.text(
-        `Estado: ${acta.estado || "-"}`,
-        20,
-        60
-      );
+  if (acta.temas && acta.temas.length > 0) {
 
-      doc.text(
-        "Descripción:",
-        20,
-        80
-      );
+    for (const tema of acta.temas) {
 
-      doc.setFontSize(11);
-
-      const descripcion =
-        doc.splitTextToSize(
-          acta.descripcion || "Sin descripción",
-          170
-        );
-
-      doc.text(
-        descripcion,
-        20,
-        90
-      );
-
-      doc.text(
-        "Temas:",
-        20,
-        130
-      );
-
-      if (
-        acta.temas &&
-        acta.temas.length > 0
-      ) {
-
-        acta.temas.forEach(
-          (tema, index) => {
-
-            doc.text(
-              `• ${tema}`,
-              25,
-              140 + index * 10
-            );
-
-          }
-        );
-
-      } else {
-
-        doc.text(
-          "Sin temas",
-          25,
-          140
-        );
-
+      // Salto de página si es necesario
+      if (y > 260) {
+        doc.addPage();
+        y = 20;
       }
 
-      doc.save(
-        `Acta_${acta._id}.pdf`
-      );
-    };
+      // Obtener descripción según el tipo que llegue
+      let descripcionTema = "Sin descripción";
 
+      if (typeof tema === "object" && tema !== null) {
+        // Backend enriquecido — viene como objeto
+        descripcionTema = tema.descripcion || tema.tema || "Sin descripción";
+        console.log("Tema como objeto:", descripcionTema);
+
+      } else if (typeof tema === "string") {
+        // Fallback — viene como ID string, buscar en backend
+        console.log("Tema como string ID:", tema);
+        try {
+          const res = await axios.get(`http://localhost:5000/api/temas/${tema}`);
+          console.log("Respuesta del backend para tema:", res.data);
+          descripcionTema = res.data.descripcion || res.data.tema || "Sin descripción";
+        } catch (err) {
+          console.error("Error buscando tema:", tema, err);
+          descripcionTema = `Tema no disponible`;
+        }
+      }
+
+      const texto = doc.splitTextToSize(`• ${descripcionTema}`, 160);
+      doc.text(texto, marginLeft + 5, y);
+      y += texto.length * 7 + 5;
+    }
+
+  } else {
+    doc.text("Sin temas registrados", marginLeft + 5, y);
+    y += 10;
+  }
+
+  // ===== FIRMAS =====
+  y += 15;
+  if (y > 250) { doc.addPage(); y = 20; }
+  doc.line(20, y, 190, y);
+  y += 20;
+  doc.text("Firma Director/a", 35, y);
+  doc.text("Firma Secretario/a", 130, y);
+  y += 5;
+  doc.line(20, y, 80, y);
+  doc.line(110, y, 170, y);
+
+  // ===== FOOTER =====
+  doc.setFontSize(10);
+  doc.text("Consejo Departamental - Ingeniería en Sistemas", 105, 285, { align: "center" });
+
+  doc.save(`Acta_${acta._id}.pdf`);
+};
   // FILTRO BUSQUEDA
   const actasFiltradas =
     actas.filter((acta) =>
@@ -512,8 +521,7 @@ const Acta = () => {
 
               <tbody>
 
-                {actasFiltradas
-                  .length > 0 ? (
+                {actasFiltradas.length > 0 ? (
 
                   actasFiltradas.map(
                     (acta) => (
@@ -530,7 +538,6 @@ const Acta = () => {
                         "
                       >
 
-                        {/* FECHA */}
                         <td className="
                           py-5
                           text-slate-600
@@ -541,7 +548,6 @@ const Acta = () => {
                           }
                         </td>
 
-                        {/* DESCRIPCION */}
                         <td className="
                           py-5
                           text-slate-600
@@ -553,7 +559,6 @@ const Acta = () => {
                           }
                         </td>
 
-                        {/* CONSEJEROS */}
                         <td className="
                           py-5
                           text-slate-600
@@ -564,7 +569,6 @@ const Acta = () => {
                           }
                         </td>
 
-                        {/* ESTADO */}
                         <td className="
                           py-5
                         ">
@@ -578,7 +582,6 @@ const Acta = () => {
 
                         </td>
 
-                        {/* ACCIONES */}
                         <td className="
                           py-5
                         ">
@@ -590,7 +593,6 @@ const Acta = () => {
                             flex-wrap
                           ">
 
-                            {/* EDITAR */}
                             <button
                               onClick={() =>
                                 navigate(
@@ -614,7 +616,6 @@ const Acta = () => {
                               Editar
                             </button>
 
-                            {/* PDF */}
                             <button
                               onClick={() =>
                                 generarPDF(
@@ -647,7 +648,6 @@ const Acta = () => {
 
                             </button>
 
-                            {/* ELIMINAR */}
                             <button
                               onClick={() =>
                                 eliminarActa(
