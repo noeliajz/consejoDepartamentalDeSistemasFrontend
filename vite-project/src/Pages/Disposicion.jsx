@@ -1,49 +1,91 @@
-import React from "react";
+// src/pages/Disposicion.jsx
+
+import React, { useEffect, useState } from "react";
 import NavbarLateral from "../Components/NavbarLateral";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 import {
   Plus,
-  Eye,
-  Pencil,
   Search,
   Bell,
   FileText,
   CheckCircle,
   Clock,
+  Download,
+  Trash2,
 } from "lucide-react";
+
+const API = "http://localhost:5000/api/disposiciones";
 
 const Disposicion = () => {
   // Simulación usuario admin
   const user = {
     role: "admin",
   };
+  const navigate = useNavigate();
+  const [disposiciones, setDisposiciones] = useState([]);
+  const [busqueda, setBusqueda] = useState("");
 
-  const disposiciones = [
-    {
-      id: 1,
-      numero: "DISP-CD-014",
-      tipo: "De Consejo",
-      descripcion: "Aprobación plan de estudio",
-      fecha: "10/04/2025",
-      estado: "Aprobada",
-    },
-    {
-      id: 2,
-      numero: "DISP-DIR-013",
-      tipo: "De Dirección",
-      descripcion: "Autorización viáticos",
-      fecha: "05/04/2025",
-      estado: "Pendiente",
-    },
-    {
-      id: 3,
-      numero: "DISP-CD-012",
-      tipo: "Académica",
-      descripcion: "Designación docente",
-      fecha: "28/03/2025",
-      estado: "En revisión",
-    },
-  ];
+  // Obtener disposiciones desde Flask + MongoDB
+  const obtenerDisposiciones = async () => {
+    try {
+      const response = await axios.get(API);
+
+      setDisposiciones(response.data);
+    } catch (error) {
+      console.error("Error al obtener disposiciones:", error);
+    }
+  };
+
+  useEffect(() => {
+    obtenerDisposiciones();
+  }, []);
+// Eliminar disposición
+const eliminarDisposicion = async (id) => {
+  const confirmar = window.confirm(
+    "¿Desea eliminar esta disposición?"
+  );
+
+  if (!confirmar) return;
+
+  try {
+    await axios.delete(`${API}/${id}`);
+
+    alert("Disposición eliminada correctamente");
+
+    obtenerDisposiciones();
+  } catch (error) {
+    console.error(
+      "Error al eliminar disposición:",
+      error
+    );
+
+    alert("Error al eliminar la disposición");
+  }
+};
+
+// Generar PDF
+const generarPDF = (disp) => {
+  window.print();
+};
+  // Filtrar búsqueda
+  const disposicionesFiltradas = disposiciones.filter((disp) =>
+    `${disp.numero} ${disp.tipo} ${disp.descripcion}`
+      .toLowerCase()
+      .includes(busqueda.toLowerCase())
+  );
+
+  // Contadores
+  const totalDisposiciones = disposiciones.length;
+
+  const aprobadas = disposiciones.filter(
+    (d) => d.estado === "Aprobada"
+  ).length;
+
+  const pendientes = disposiciones.filter(
+    (d) => d.estado === "Pendiente"
+  ).length;
 
   return (
     <div className="flex bg-slate-100 min-h-screen">
@@ -70,30 +112,33 @@ const Disposicion = () => {
               Notificar
             </button>
 
-            <button className="flex items-center gap-2 px-5 py-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white shadow-md transition">
-              <Plus size={18} />
-              Nueva disposición
-            </button>
-          </div>
-        </div>
+                      <button
+            onClick={() => navigate("/NuevaDisposicion")}
+            className="flex items-center gap-2 px-5 py-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white shadow-md transition"
+          >
+            <Plus size={18} />
+            Nueva disposición
+          </button>
+                    </div>
+                  </div>
 
         {/* Cards resumen */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <CardResumen
             titulo="Total Disposiciones"
-            valor="36"
+            valor={totalDisposiciones}
             icon={<FileText size={24} />}
           />
 
           <CardResumen
             titulo="Aprobadas"
-            valor="28"
+            valor={aprobadas}
             icon={<CheckCircle size={24} />}
           />
 
           <CardResumen
             titulo="Pendientes"
-            valor="8"
+            valor={pendientes}
             icon={<Clock size={24} />}
           />
         </div>
@@ -121,6 +166,8 @@ const Disposicion = () => {
               <input
                 type="text"
                 placeholder="Buscar disposición..."
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
                 className="pl-10 pr-4 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -146,9 +193,9 @@ const Disposicion = () => {
               </thead>
 
               <tbody>
-                {disposiciones.map((disp) => (
+                {disposicionesFiltradas.map((disp) => (
                   <tr
-                    key={disp.id}
+                    key={disp._id}
                     className="border-b border-slate-100 hover:bg-slate-50 transition"
                   >
                     <td className="py-5 font-medium text-slate-700">
@@ -161,35 +208,112 @@ const Disposicion = () => {
                       </span>
                     </td>
 
-                    <td className="py-5 text-slate-600">{disp.descripcion}</td>
+                    <td className="py-5 text-slate-600">
+                      {disp.descripcion}
+                    </td>
 
-                    <td className="py-5 text-slate-600">{disp.fecha}</td>
+                    <td className="py-5 text-slate-600">
+                      {disp.fecha}
+                    </td>
 
                     <td className="py-5">
                       <EstadoBadge estado={disp.estado} />
                     </td>
 
                     <td className="py-5">
-                      <div className="flex items-center gap-3">
-                        <button className="p-2 rounded-lg border border-slate-300 hover:bg-slate-100 transition">
-                          <Eye size={18} className="text-slate-700" />
-                        </button>
+  <div
+    className="
+      flex
+      items-center
+      gap-3
+      flex-wrap
+    "
+  >
+    <button
+      onClick={() =>
+        navigate(`/EditarDisposicion/${disp._id}`)
+      }
+      className="
+        rounded-lg
+        border
+        border-yellow-200
+        bg-yellow-50
+        px-4
+        py-2
+        text-sm
+        font-semibold
+        text-yellow-700
+        hover:bg-yellow-100
+        transition
+      "
+    >
+      Editar
+    </button>
 
-                        <button className="p-2 rounded-lg border border-slate-300 hover:bg-slate-100 transition">
-                          <Pencil size={18} className="text-slate-700" />
-                        </button>
-                        <button
-                          onClick={() =>
-                            navigate(`/editar-expediente/${exp.numero}`)
-                          }
-                          className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700 hover:bg-blue-100 transition"
-                        >
-                          Drive
-                        </button>
-                      </div>
-                    </td>
+    <button
+      onClick={() => generarPDF(disp)}
+      className="
+        flex
+        items-center
+        gap-2
+        rounded-lg
+        border
+        border-blue-200
+        bg-blue-50
+        px-4
+        py-2
+        text-sm
+        font-semibold
+        text-blue-700
+        hover:bg-blue-100
+        transition
+      "
+    >
+      <Download size={16} />
+
+      PDF
+    </button>
+
+    <button
+      onClick={() =>
+        eliminarDisposicion(disp._id)
+      }
+      className="
+        flex
+        items-center
+        gap-2
+        rounded-lg
+        border
+        border-red-200
+        bg-red-50
+        px-4
+        py-2
+        text-sm
+        font-semibold
+        text-red-700
+        hover:bg-red-100
+        transition
+      "
+    >
+      <Trash2 size={16} />
+
+      Eliminar
+    </button>
+  </div>
+</td>
                   </tr>
                 ))}
+
+                {disposicionesFiltradas.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan="6"
+                      className="text-center py-10 text-slate-500"
+                    >
+                      No se encontraron disposiciones
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -205,7 +329,9 @@ const CardResumen = ({ titulo, valor, icon }) => {
       <div>
         <p className="text-slate-500 text-sm">{titulo}</p>
 
-        <h3 className="text-3xl font-bold text-slate-800 mt-2">{valor}</h3>
+        <h3 className="text-3xl font-bold text-slate-800 mt-2">
+          {valor}
+        </h3>
       </div>
 
       <div className="w-14 h-14 rounded-2xl bg-blue-100 flex items-center justify-center text-blue-700">
@@ -226,7 +352,9 @@ const EstadoBadge = ({ estado }) => {
 
   return (
     <span
-      className={`px-3 py-1 rounded-full text-sm font-medium ${colores[estado]}`}
+      className={`px-3 py-1 rounded-full text-sm font-medium ${
+        colores[estado] || "bg-slate-100 text-slate-700"
+      }`}
     >
       {estado}
     </span>
