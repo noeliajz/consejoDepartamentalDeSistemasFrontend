@@ -1,18 +1,12 @@
 // src/pages/EditarDisposicion.jsx
 
-import React, {
-  useEffect,
-  useState,
-} from "react";
+import React, { useEffect, useState } from "react";
 
-import {
-  useNavigate,
-  useParams,
-} from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import axios from "axios";
 
-import NavbarLateral from "../Components/NavbarLateral";
+import NavbarHorizontalAdmin from "../Components/NavbarHorizontalAdmin";
 
 import {
   Save,
@@ -23,8 +17,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 
-const API =
-  "http://localhost:5000/api/disposiciones";
+const API = "http://localhost:5000/api/disposiciones";
 
 const EditarDisposicion = () => {
   const navigate = useNavigate();
@@ -36,57 +29,43 @@ const EditarDisposicion = () => {
     role: "admin",
   };
 
-  const [loading, setLoading] =
-    useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const [formData, setFormData] =
-    useState({
-      numero: "",
-      tipo: "",
-      descripcion: "",
-      fecha: "",
-      estado: "",
-    });
+  const [formData, setFormData] = useState({
+    numero: "",
+    tipo: "",
+    descripcion: "",
+    fecha: "",
+    estado: "",
+  });
 
   // Obtener disposición
-  const obtenerDisposicion =
-    async () => {
-      try {
-        const response =
-          await axios.get(
-            `${API}/${id}`
-          );
+  const obtenerDisposicion = async () => {
+    try {
+      const response = await axios.get(`${API}/${id}`);
 
-        const data = response.data;
+      const data = response.data;
 
-        setFormData({
-          numero:
-            data.numero || "",
+      setFormData({
+        numero: data.numero || "",
 
-          tipo:
-            data.tipo || "",
+        tipo: data.tipo || "",
 
-          descripcion:
-            data.descripcion || "",
+        descripcion: data.descripcion || "",
 
-          fecha:
-            data.fecha || "",
+        fecha: data.fecha || "",
 
-          estado:
-            data.estado || "",
-        });
-      } catch (error) {
-        console.error(
-          "Error al obtener disposición:",
-          error.response?.data ||
-            error
-        );
+        estado: data.estado || "",
+      });
+    } catch (error) {
+      console.error(
+        "Error al obtener disposición:",
+        error.response?.data || error,
+      );
 
-        alert(
-          "Error al cargar la disposición"
-        );
-      }
-    };
+      alert("Error al cargar la disposición");
+    }
+  };
 
   useEffect(() => {
     obtenerDisposicion();
@@ -96,8 +75,7 @@ const EditarDisposicion = () => {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]:
-        e.target.value,
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -108,27 +86,19 @@ const EditarDisposicion = () => {
     try {
       setLoading(true);
 
-      await axios.put(
-        `${API}/${id}`,
-        formData
-      );
+      await axios.put(`${API}/${id}`, formData);
 
-      alert(
-        "Disposición actualizada correctamente"
-      );
+      alert("Disposición actualizada correctamente");
 
       // Redirigir
       navigate("/Disposicion");
     } catch (error) {
       console.error(
         "Error al actualizar disposición:",
-        error.response?.data ||
-          error
+        error.response?.data || error,
       );
 
-      alert(
-        "Error al actualizar la disposición"
-      );
+      alert("Error al actualizar la disposición");
     } finally {
       setLoading(false);
     }
@@ -137,7 +107,7 @@ const EditarDisposicion = () => {
   return (
     <div className="flex bg-slate-100 min-h-screen">
       {/* Navbar */}
-      <NavbarLateral user={user} />
+      <NavbarHorizontalAdmin user={user} />
 
       {/* Contenido */}
       <main className="flex-1 ml-64 p-8">
@@ -173,17 +143,12 @@ const EditarDisposicion = () => {
                 mt-1
               "
             >
-              Modifique la información
-              de la disposición
+              Modifique la información de la disposición
             </p>
           </div>
 
           <button
-            onClick={() =>
-              navigate(
-                "/Disposicion"
-              )
-            }
+            onClick={() => navigate("/Disposicion")}
             className="
               flex
               items-center
@@ -199,7 +164,6 @@ const EditarDisposicion = () => {
             "
           >
             <ArrowLeft size={18} />
-
             Volver
           </button>
         </div>
@@ -215,11 +179,7 @@ const EditarDisposicion = () => {
             p-8
           "
         >
-          <form
-            onSubmit={
-              handleSubmit
-            }
-          >
+          <form onSubmit={handleSubmit}>
             <div
               className="
                 grid
@@ -239,8 +199,7 @@ const EditarDisposicion = () => {
                     mb-2
                   "
                 >
-                  Número de
-                  disposición
+                  Número de disposición
                 </label>
 
                 <div className="relative">
@@ -257,12 +216,8 @@ const EditarDisposicion = () => {
                   <input
                     type="text"
                     name="numero"
-                    value={
-                      formData.numero
-                    }
-                    onChange={
-                      handleChange
-                    }
+                    value={formData.numero}
+                    onChange={handleChange}
                     required
                     className="
                       w-full
@@ -307,12 +262,8 @@ const EditarDisposicion = () => {
 
                   <select
                     name="tipo"
-                    value={
-                      formData.tipo
-                    }
-                    onChange={
-                      handleChange
-                    }
+                    value={formData.tipo}
+                    onChange={handleChange}
                     required
                     className="
                       w-full
@@ -327,26 +278,15 @@ const EditarDisposicion = () => {
                       focus:ring-blue-500
                     "
                   >
-                    <option value="">
-                      Seleccione un
-                      tipo
-                    </option>
+                    <option value="">Seleccione un tipo</option>
 
-                    <option value="Académica">
-                      Académica
-                    </option>
+                    <option value="Académica">Académica</option>
 
-                    <option value="De Consejo">
-                      De Consejo
-                    </option>
+                    <option value="De Consejo">De Consejo</option>
 
-                    <option value="De Dirección">
-                      De Dirección
-                    </option>
+                    <option value="De Dirección">De Dirección</option>
 
-                    <option value="Administrativa">
-                      Administrativa
-                    </option>
+                    <option value="Administrativa">Administrativa</option>
                   </select>
                 </div>
               </div>
@@ -379,12 +319,8 @@ const EditarDisposicion = () => {
                   <input
                     type="date"
                     name="fecha"
-                    value={
-                      formData.fecha
-                    }
-                    onChange={
-                      handleChange
-                    }
+                    value={formData.fecha}
+                    onChange={handleChange}
                     required
                     className="
                       w-full
@@ -429,12 +365,8 @@ const EditarDisposicion = () => {
 
                   <select
                     name="estado"
-                    value={
-                      formData.estado
-                    }
-                    onChange={
-                      handleChange
-                    }
+                    value={formData.estado}
+                    onChange={handleChange}
                     required
                     className="
                       w-full
@@ -449,22 +381,13 @@ const EditarDisposicion = () => {
                       focus:ring-blue-500
                     "
                   >
-                    <option value="">
-                      Seleccione un
-                      estado
-                    </option>
+                    <option value="">Seleccione un estado</option>
 
-                    <option value="Pendiente">
-                      Pendiente
-                    </option>
+                    <option value="Pendiente">Pendiente</option>
 
-                    <option value="Aprobada">
-                      Aprobada
-                    </option>
+                    <option value="Aprobada">Aprobada</option>
 
-                    <option value="En revisión">
-                      En revisión
-                    </option>
+                    <option value="En revisión">En revisión</option>
                   </select>
                 </div>
               </div>
@@ -486,12 +409,8 @@ const EditarDisposicion = () => {
 
               <textarea
                 name="descripcion"
-                value={
-                  formData.descripcion
-                }
-                onChange={
-                  handleChange
-                }
+                value={formData.descripcion}
+                onChange={handleChange}
                 rows="5"
                 required
                 className="
@@ -520,11 +439,7 @@ const EditarDisposicion = () => {
             >
               <button
                 type="button"
-                onClick={() =>
-                  navigate(
-                    "/Disposicion"
-                  )
-                }
+                onClick={() => navigate("/Disposicion")}
                 className="
                   px-6
                   py-3
@@ -559,9 +474,7 @@ const EditarDisposicion = () => {
               >
                 <Save size={18} />
 
-                {loading
-                  ? "Guardando..."
-                  : "Guardar cambios"}
+                {loading ? "Guardando..." : "Guardar cambios"}
               </button>
             </div>
           </form>

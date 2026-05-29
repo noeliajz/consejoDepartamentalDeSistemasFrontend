@@ -1,11 +1,8 @@
 // src/pages/Acta.jsx
 
-import React, {
-  useEffect,
-  useState,
-} from "react";
+import React, { useEffect, useState } from "react";
 
-import NavbarLateral from "../Components/NavbarLateral";
+import NavbarHorizontalAdmin from "../Components/NavbarHorizontalAdmin";
 
 import {
   Plus,
@@ -24,239 +21,194 @@ import { useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
 
 const Acta = () => {
-
   const user = {
     role: "admin",
   };
 
   const navigate = useNavigate();
 
-  const [actas, setActas] =
-    useState([]);
+  const [actas, setActas] = useState([]);
 
-  const [busqueda, setBusqueda] =
-    useState("");
+  const [busqueda, setBusqueda] = useState("");
 
   // OBTENER ACTAS
   useEffect(() => {
-
     obtenerActas();
-
   }, []);
 
-  const obtenerActas =
-    async () => {
+  const obtenerActas = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:5000/api/actas-reunion",
+      );
 
-      try {
-
-        const response =
-          await axios.get(
-            "http://localhost:5000/api/actas-reunion"
-          );
-
-        setActas(
-          response.data
-        );
-
-      } catch (error) {
-
-        console.error(
-          "Error obteniendo actas:",
-          error
-        );
-
-      }
-    };
+      setActas(response.data);
+    } catch (error) {
+      console.error("Error obteniendo actas:", error);
+    }
+  };
 
   // ELIMINAR ACTA
-  const eliminarActa =
-    async (id) => {
+  const eliminarActa = async (id) => {
+    const confirmar = window.confirm("¿Desea eliminar esta acta?");
 
-      const confirmar =
-        window.confirm(
-          "¿Desea eliminar esta acta?"
-        );
+    if (!confirmar) return;
 
-      if (!confirmar) return;
+    try {
+      await axios.delete(`http://localhost:5000/api/actas-reunion/${id}`);
 
-      try {
+      alert("Acta eliminada correctamente");
 
-        await axios.delete(
-          `http://localhost:5000/api/actas-reunion/${id}`
-        );
+      obtenerActas();
+    } catch (error) {
+      console.error("Error eliminando acta:", error);
 
-        alert(
-          "Acta eliminada correctamente"
-        );
+      alert("Error eliminando acta");
+    }
+  };
 
-        obtenerActas();
+  // GENERAR PDF
+  const generarPDF = async (acta) => {
+    const doc = new jsPDF();
+    const marginLeft = 20;
+    let y = 20;
 
-      } catch (error) {
+    // DEBUG — quitalo después de confirmar que funciona
+    console.log("acta.temas recibidos:", acta.temas);
 
-        console.error(
-          "Error eliminando acta:",
-          error
-        );
+    // ===== TÍTULO =====
+    doc.setFont("times", "bold");
+    doc.setFontSize(18);
+    doc.text("ACTA DE REUNIÓN", 105, y, { align: "center" });
+    y += 10;
+    doc.setLineWidth(0.5);
+    doc.line(20, y, 190, y);
+    y += 15;
 
-        alert(
-          "Error eliminando acta"
-        );
+    // ===== DATOS =====
+    doc.setFont("times", "normal");
+    doc.setFontSize(12);
+    doc.text(`Fecha: ${acta.fecha || "-"}`, marginLeft, y);
+    y += 10;
+    doc.text(`Estado: ${acta.estado || "-"}`, marginLeft, y);
+    y += 10;
+    doc.text(`Cantidad de Consejeros: ${acta.consejeros || 0}`, marginLeft, y);
+    y += 15;
 
-      }
-    };
+    // ===== DESCRIPCIÓN =====
+    doc.setFont("times", "bold");
+    doc.text("Descripción:", marginLeft, y);
+    y += 8;
+    doc.setFont("times", "normal");
+    const descripcion = doc.splitTextToSize(
+      acta.descripcion || "Sin descripción",
+      170,
+    );
+    doc.text(descripcion, marginLeft, y);
+    y += descripcion.length * 7 + 15;
 
+    // ===== TEMAS =====
+    doc.setFont("times", "bold");
+    doc.text("Temas Tratados:", marginLeft, y);
+    y += 10;
+    doc.setFont("times", "normal");
 
-    // GENERAR PDF
-const generarPDF = async (acta) => {
-  const doc = new jsPDF();
-  const marginLeft = 20;
-  let y = 20;
-
-  // DEBUG — quitalo después de confirmar que funciona
-  console.log("acta.temas recibidos:", acta.temas);
-
-  // ===== TÍTULO =====
-  doc.setFont("times", "bold");
-  doc.setFontSize(18);
-  doc.text("ACTA DE REUNIÓN", 105, y, { align: "center" });
-  y += 10;
-  doc.setLineWidth(0.5);
-  doc.line(20, y, 190, y);
-  y += 15;
-
-  // ===== DATOS =====
-  doc.setFont("times", "normal");
-  doc.setFontSize(12);
-  doc.text(`Fecha: ${acta.fecha || "-"}`, marginLeft, y);
-  y += 10;
-  doc.text(`Estado: ${acta.estado || "-"}`, marginLeft, y);
-  y += 10;
-  doc.text(`Cantidad de Consejeros: ${acta.consejeros || 0}`, marginLeft, y);
-  y += 15;
-
-  // ===== DESCRIPCIÓN =====
-  doc.setFont("times", "bold");
-  doc.text("Descripción:", marginLeft, y);
-  y += 8;
-  doc.setFont("times", "normal");
-  const descripcion = doc.splitTextToSize(acta.descripcion || "Sin descripción", 170);
-  doc.text(descripcion, marginLeft, y);
-  y += descripcion.length * 7 + 15;
-
-  // ===== TEMAS =====
-  doc.setFont("times", "bold");
-  doc.text("Temas Tratados:", marginLeft, y);
-  y += 10;
-  doc.setFont("times", "normal");
-
-  if (acta.temas && acta.temas.length > 0) {
-
-    for (const tema of acta.temas) {
-
-      // Salto de página si es necesario
-      if (y > 260) {
-        doc.addPage();
-        y = 20;
-      }
-
-      // Obtener descripción según el tipo que llegue
-      let descripcionTema = "Sin descripción";
-
-      if (typeof tema === "object" && tema !== null) {
-        // Backend enriquecido — viene como objeto
-        descripcionTema = tema.descripcion || tema.tema || "Sin descripción";
-        console.log("Tema como objeto:", descripcionTema);
-
-      } else if (typeof tema === "string") {
-        // Fallback — viene como ID string, buscar en backend
-        console.log("Tema como string ID:", tema);
-        try {
-          const res = await axios.get(`http://localhost:5000/api/temas/${tema}`);
-          console.log("Respuesta del backend para tema:", res.data);
-          descripcionTema = res.data.descripcion || res.data.tema || "Sin descripción";
-        } catch (err) {
-          console.error("Error buscando tema:", tema, err);
-          descripcionTema = `Tema no disponible`;
+    if (acta.temas && acta.temas.length > 0) {
+      for (const tema of acta.temas) {
+        // Salto de página si es necesario
+        if (y > 260) {
+          doc.addPage();
+          y = 20;
         }
-      }
 
-      const texto = doc.splitTextToSize(`• ${descripcionTema}`, 160);
-      doc.text(texto, marginLeft + 5, y);
-      y += texto.length * 7 + 5;
+        // Obtener descripción según el tipo que llegue
+        let descripcionTema = "Sin descripción";
+
+        if (typeof tema === "object" && tema !== null) {
+          // Backend enriquecido — viene como objeto
+          descripcionTema = tema.descripcion || tema.tema || "Sin descripción";
+          console.log("Tema como objeto:", descripcionTema);
+        } else if (typeof tema === "string") {
+          // Fallback — viene como ID string, buscar en backend
+          console.log("Tema como string ID:", tema);
+          try {
+            const res = await axios.get(
+              `http://localhost:5000/api/temas/${tema}`,
+            );
+            console.log("Respuesta del backend para tema:", res.data);
+            descripcionTema =
+              res.data.descripcion || res.data.tema || "Sin descripción";
+          } catch (err) {
+            console.error("Error buscando tema:", tema, err);
+            descripcionTema = `Tema no disponible`;
+          }
+        }
+
+        const texto = doc.splitTextToSize(`• ${descripcionTema}`, 160);
+        doc.text(texto, marginLeft + 5, y);
+        y += texto.length * 7 + 5;
+      }
+    } else {
+      doc.text("Sin temas registrados", marginLeft + 5, y);
+      y += 10;
     }
 
-  } else {
-    doc.text("Sin temas registrados", marginLeft + 5, y);
-    y += 10;
-  }
+    // ===== FIRMAS =====
+    y += 15;
+    if (y > 250) {
+      doc.addPage();
+      y = 20;
+    }
+    doc.line(20, y, 190, y);
+    y += 20;
+    doc.text("Firma Director/a", 35, y);
+    doc.text("Firma Secretario/a", 130, y);
+    y += 5;
+    doc.line(20, y, 80, y);
+    doc.line(110, y, 170, y);
 
-  // ===== FIRMAS =====
-  y += 15;
-  if (y > 250) { doc.addPage(); y = 20; }
-  doc.line(20, y, 190, y);
-  y += 20;
-  doc.text("Firma Director/a", 35, y);
-  doc.text("Firma Secretario/a", 130, y);
-  y += 5;
-  doc.line(20, y, 80, y);
-  doc.line(110, y, 170, y);
+    // ===== FOOTER =====
+    doc.setFontSize(10);
+    doc.text("Consejo Departamental - Ingeniería en Sistemas", 105, 285, {
+      align: "center",
+    });
 
-  // ===== FOOTER =====
-  doc.setFontSize(10);
-  doc.text("Consejo Departamental - Ingeniería en Sistemas", 105, 285, { align: "center" });
-
-  doc.save(`Acta_${acta._id}.pdf`);
-};
+    doc.save(`Acta_${acta._id}.pdf`);
+  };
   // FILTRO BUSQUEDA
-  const actasFiltradas =
-    actas.filter((acta) =>
-      (
-        acta.descripcion || ""
-      )
-        .toLowerCase()
-        .includes(
-          busqueda.toLowerCase()
-        )
-    );
+  const actasFiltradas = actas.filter((acta) =>
+    (acta.descripcion || "").toLowerCase().includes(busqueda.toLowerCase()),
+  );
 
   // CONTADORES
-  const totalActas =
-    actas.length;
+  const totalActas = actas.length;
 
-  const aprobadas =
-    actas.filter(
-      (a) =>
-        a.estado ===
-        "Aprobada"
-    ).length;
+  const aprobadas = actas.filter((a) => a.estado === "Aprobada").length;
 
-  const pendientes =
-    actas.filter(
-      (a) =>
-        a.estado ===
-        "Pendiente"
-    ).length;
+  const pendientes = actas.filter((a) => a.estado === "Pendiente").length;
 
   return (
-
-    <div className="
+    <div
+      className="
       flex
       bg-slate-100
       min-h-screen
-    ">
-
+    "
+    >
       {/* NAVBAR */}
-      <NavbarLateral user={user} />
+      <NavbarHorizontalAdmin user={user} />
 
       {/* CONTENIDO */}
-      <main className="
+      <main
+        className="
         flex-1
         ml-64
         p-8
-      ">
-
+      "
+      >
         {/* HEADER */}
-        <div className="
+        <div
+          className="
           bg-white
           rounded-2xl
           shadow-sm
@@ -267,35 +219,39 @@ const generarPDF = async (acta) => {
           flex
           items-center
           justify-between
-        ">
-
+        "
+        >
           <div>
-
-            <h1 className="
+            <h1
+              className="
               text-3xl
               font-bold
               text-slate-800
-            ">
+            "
+            >
               Gestión de Actas
             </h1>
 
-            <p className="
+            <p
+              className="
               text-slate-500
               mt-1
-            ">
+            "
+            >
               Administración de actas
             </p>
-
           </div>
 
-          <div className="
+          <div
+            className="
             flex
             items-center
             gap-4
-          ">
-
+          "
+          >
             {/* NOTIFICAR */}
-            <button className="
+            <button
+              className="
               flex
               items-center
               gap-2
@@ -307,21 +263,15 @@ const generarPDF = async (acta) => {
               text-slate-700
               hover:bg-slate-100
               transition
-            ">
-
+            "
+            >
               <Bell size={18} />
-
               Notificar reunión
-
             </button>
 
             {/* NUEVA ACTA */}
             <button
-              onClick={() =>
-                navigate(
-                  "/NuevaActa"
-                )
-              }
+              onClick={() => navigate("/NuevaActa")}
               className="
                 flex
                 items-center
@@ -336,95 +286,89 @@ const generarPDF = async (acta) => {
                 transition
               "
             >
-
               <Plus size={18} />
-
               Nueva acta
-
             </button>
-
           </div>
-
         </div>
 
         {/* CARDS */}
-        <div className="
+        <div
+          className="
           grid
           grid-cols-1
           md:grid-cols-3
           gap-6
           mb-8
-        ">
-
+        "
+        >
           <CardResumen
             titulo="Total Actas"
             valor={totalActas}
-            icon={
-              <FileText size={24} />
-            }
+            icon={<FileText size={24} />}
           />
 
           <CardResumen
             titulo="Aprobadas"
             valor={aprobadas}
-            icon={
-              <Eye size={24} />
-            }
+            icon={<Eye size={24} />}
           />
 
           <CardResumen
             titulo="Pendientes"
             valor={pendientes}
-            icon={
-              <FileText size={24} />
-            }
+            icon={<FileText size={24} />}
           />
-
         </div>
 
         {/* TABLA */}
-        <div className="
+        <div
+          className="
           bg-white
           rounded-2xl
           shadow-sm
           border
           border-slate-200
           p-6
-        ">
-
+        "
+        >
           {/* TOP */}
-          <div className="
+          <div
+            className="
             flex
             items-center
             justify-between
             mb-6
-          ">
-
+          "
+          >
             <div>
-
-              <h2 className="
+              <h2
+                className="
                 text-xl
                 font-semibold
                 text-slate-800
-              ">
+              "
+              >
                 Actas registradas
               </h2>
 
-              <p className="
+              <p
+                className="
                 text-slate-500
                 text-sm
                 mt-1
-              ">
+              "
+              >
                 Listado completo de actas
               </p>
-
             </div>
 
             {/* BUSCADOR */}
-            <div className="
+            <div
+              className="
               relative
-            ">
-
+            "
+            >
               <Search
                 size={18}
                 className="
@@ -439,11 +383,7 @@ const generarPDF = async (acta) => {
                 type="text"
                 placeholder="Buscar acta..."
                 value={busqueda}
-                onChange={(e) =>
-                  setBusqueda(
-                    e.target.value
-                  )
-                }
+                onChange={(e) => setBusqueda(e.target.value)}
                 className="
                   pl-10
                   pr-4
@@ -456,150 +396,141 @@ const generarPDF = async (acta) => {
                   focus:ring-blue-500
                 "
               />
-
             </div>
-
           </div>
 
           {/* TABLA */}
-          <div className="
+          <div
+            className="
             overflow-x-auto
-          ">
-
-            <table className="
+          "
+          >
+            <table
+              className="
               w-full
               border-collapse
-            ">
-
+            "
+            >
               <thead>
-
-                <tr className="
+                <tr
+                  className="
                   border-b
                   border-slate-200
                   text-slate-500
                   text-sm
-                ">
-
-                  <th className="
+                "
+                >
+                  <th
+                    className="
                     text-left
                     py-4
-                  ">
+                  "
+                  >
                     Fecha de Ingreso
                   </th>
 
-                  <th className="
+                  <th
+                    className="
                     text-left
                     py-4
-                  ">
+                  "
+                  >
                     Descripción
                   </th>
 
-                  <th className="
+                  <th
+                    className="
                     text-left
                     py-4
-                  ">
+                  "
+                  >
                     Cantidad de consejeros
                   </th>
 
-                  <th className="
+                  <th
+                    className="
                     text-left
                     py-4
-                  ">
+                  "
+                  >
                     Estado
                   </th>
 
-                  <th className="
+                  <th
+                    className="
                     text-left
                     py-4
-                  ">
+                  "
+                  >
                     Acciones
                   </th>
-
                 </tr>
-
               </thead>
 
               <tbody>
-
                 {actasFiltradas.length > 0 ? (
-
-                  actasFiltradas.map(
-                    (acta) => (
-
-                      <tr
-                        key={
-                          acta._id
-                        }
-                        className="
+                  actasFiltradas.map((acta) => (
+                    <tr
+                      key={acta._id}
+                      className="
                           border-b
                           border-slate-100
                           hover:bg-slate-50
                           transition
                         "
-                      >
-
-                        <td className="
+                    >
+                      <td
+                        className="
                           py-5
                           text-slate-600
-                        ">
-                          {
-                            acta.fecha ||
-                            "-"
-                          }
-                        </td>
+                        "
+                      >
+                        {acta.fecha || "-"}
+                      </td>
 
-                        <td className="
+                      <td
+                        className="
                           py-5
                           text-slate-600
                           max-w-sm
-                        ">
-                          {
-                            acta.descripcion ||
-                            "-"
-                          }
-                        </td>
+                        "
+                      >
+                        {acta.descripcion || "-"}
+                      </td>
 
-                        <td className="
+                      <td
+                        className="
                           py-5
                           text-slate-600
-                        ">
-                          {
-                            acta.consejeros ||
-                            0
-                          }
-                        </td>
+                        "
+                      >
+                        {acta.consejeros || 0}
+                      </td>
 
-                        <td className="
+                      <td
+                        className="
                           py-5
-                        ">
+                        "
+                      >
+                        <EstadoBadge estado={acta.estado || "Pendiente"} />
+                      </td>
 
-                          <EstadoBadge
-                            estado={
-                              acta.estado ||
-                              "Pendiente"
-                            }
-                          />
-
-                        </td>
-
-                        <td className="
+                      <td
+                        className="
                           py-5
-                        ">
-
-                          <div className="
+                        "
+                      >
+                        <div
+                          className="
                             flex
                             items-center
                             gap-3
                             flex-wrap
-                          ">
-
-                            <button
-                              onClick={() =>
-                                navigate(
-                                  `/EditarActa/${acta._id}`
-                                )
-                              }
-                              className="
+                          "
+                        >
+                          <button
+                            onClick={() => navigate(`/EditarActa/${acta._id}`)}
+                            className="
                                 rounded-lg
                                 border
                                 border-yellow-200
@@ -612,17 +543,13 @@ const generarPDF = async (acta) => {
                                 hover:bg-yellow-100
                                 transition
                               "
-                            >
-                              Editar
-                            </button>
+                          >
+                            Editar
+                          </button>
 
-                            <button
-                              onClick={() =>
-                                generarPDF(
-                                  acta
-                                )
-                              }
-                              className="
+                          <button
+                            onClick={() => generarPDF(acta)}
+                            className="
                                 flex
                                 items-center
                                 gap-2
@@ -638,23 +565,14 @@ const generarPDF = async (acta) => {
                                 hover:bg-blue-100
                                 transition
                               "
-                            >
+                          >
+                            <Download size={16} />
+                            PDF
+                          </button>
 
-                              <Download
-                                size={16}
-                              />
-
-                              PDF
-
-                            </button>
-
-                            <button
-                              onClick={() =>
-                                eliminarActa(
-                                  acta._id
-                                )
-                              }
-                              className="
+                          <button
+                            onClick={() => eliminarActa(acta._id)}
+                            className="
                                 flex
                                 items-center
                                 gap-2
@@ -670,29 +588,16 @@ const generarPDF = async (acta) => {
                                 hover:bg-red-100
                                 transition
                               "
-                            >
-
-                              <Trash2
-                                size={16}
-                              />
-
-                              Eliminar
-
-                            </button>
-
-                          </div>
-
-                        </td>
-
-                      </tr>
-
-                    )
-                  )
-
+                          >
+                            <Trash2 size={16} />
+                            Eliminar
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
                 ) : (
-
                   <tr>
-
                     <td
                       colSpan="5"
                       className="
@@ -703,35 +608,22 @@ const generarPDF = async (acta) => {
                     >
                       No se encontraron actas
                     </td>
-
                   </tr>
-
                 )}
-
               </tbody>
-
             </table>
-
           </div>
-
         </div>
-
       </main>
-
     </div>
   );
 };
 
 // CARD
-const CardResumen = ({
-  titulo,
-  valor,
-  icon,
-}) => {
-
+const CardResumen = ({ titulo, valor, icon }) => {
   return (
-
-    <div className="
+    <div
+      className="
       bg-white
       rounded-2xl
       border
@@ -743,29 +635,32 @@ const CardResumen = ({
       justify-between
       hover:shadow-md
       transition
-    ">
-
+    "
+    >
       <div>
-
-        <p className="
+        <p
+          className="
           text-slate-500
           text-sm
-        ">
+        "
+        >
           {titulo}
         </p>
 
-        <h3 className="
+        <h3
+          className="
           text-3xl
           font-bold
           text-slate-800
           mt-2
-        ">
+        "
+        >
           {valor}
         </h3>
-
       </div>
 
-      <div className="
+      <div
+        className="
         w-14
         h-14
         rounded-2xl
@@ -774,33 +669,25 @@ const CardResumen = ({
         items-center
         justify-center
         text-blue-700
-      ">
+      "
+      >
         {icon}
       </div>
-
     </div>
   );
 };
 
 // BADGE
-const EstadoBadge = ({
-  estado,
-}) => {
-
+const EstadoBadge = ({ estado }) => {
   const colores = {
+    Aprobada: "bg-green-100 text-green-700",
 
-    Aprobada:
-      "bg-green-100 text-green-700",
+    Pendiente: "bg-yellow-100 text-yellow-700",
 
-    Pendiente:
-      "bg-yellow-100 text-yellow-700",
-
-    "En revisión":
-      "bg-blue-100 text-blue-700",
+    "En revisión": "bg-blue-100 text-blue-700",
   };
 
   return (
-
     <span
       className={`
         px-3
@@ -808,17 +695,11 @@ const EstadoBadge = ({
         rounded-full
         text-sm
         font-medium
-        ${
-          colores[
-            estado
-          ] ||
-          "bg-gray-100 text-gray-700"
-        }
+        ${colores[estado] || "bg-gray-100 text-gray-700"}
       `}
     >
       {estado}
     </span>
-
   );
 };
 

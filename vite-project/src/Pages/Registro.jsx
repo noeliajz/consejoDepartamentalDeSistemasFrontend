@@ -1,9 +1,8 @@
-
 import { useState } from "react";
 import axios from "axios";
 import { UserPlus } from "lucide-react";
 
-import NavbarLateral from "../components/NavbarLateral";
+import NavbarHorizontalAdmin from "../components/NavbarHorizontalAdmin";
 
 export default function Registro() {
   const [nombre, setNombre] = useState("");
@@ -25,7 +24,7 @@ export default function Registro() {
           email,
           password,
           rol: "usuario",
-        }
+        },
       );
 
       console.log(response.data);
@@ -34,14 +33,10 @@ export default function Registro() {
 
       // redireccionar al login
       window.location.href = "/Login";
-
     } catch (error) {
       console.error(error);
 
-      alert(
-        error.response?.data?.error ||
-        "Error al registrarse"
-      );
+      alert(error.response?.data?.error || "Error al registrarse");
     } finally {
       setLoading(false);
     }
@@ -49,25 +44,19 @@ export default function Registro() {
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-
       {/* Sidebar */}
-      <NavbarLateral />
+      <NavbarHorizontalAdmin />
 
       {/* Contenido */}
       <div className="flex-1 ml-64 flex items-center justify-center p-6">
-
         <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
-
           {/* Header */}
           <div className="flex flex-col items-center mb-8">
-
             <div className="bg-blue-100 p-4 rounded-full mb-4">
               <UserPlus className="text-blue-700" size={32} />
             </div>
 
-            <h1 className="text-3xl font-bold text-gray-800">
-              Crear cuenta
-            </h1>
+            <h1 className="text-3xl font-bold text-gray-800">Crear cuenta</h1>
 
             <p className="text-gray-500 mt-2 text-center">
               Registrate para acceder al sistema
@@ -75,11 +64,7 @@ export default function Registro() {
           </div>
 
           {/* Formulario */}
-          <form
-            onSubmit={handleRegistro}
-            className="space-y-5"
-          >
-
+          <form onSubmit={handleRegistro} className="space-y-5">
             {/* Nombre */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -90,9 +75,7 @@ export default function Registro() {
                 type="text"
                 placeholder="Juan Perez"
                 value={nombre}
-                onChange={(e) =>
-                  setNombre(e.target.value)
-                }
+                onChange={(e) => setNombre(e.target.value)}
                 className="
                   w-full
                   border
@@ -118,9 +101,7 @@ export default function Registro() {
                 type="email"
                 placeholder="correo@ejemplo.com"
                 value={email}
-                onChange={(e) =>
-                  setEmail(e.target.value)
-                }
+                onChange={(e) => setEmail(e.target.value)}
                 className="
                   w-full
                   border
@@ -146,9 +127,7 @@ export default function Registro() {
                 type="password"
                 placeholder="********"
                 value={password}
-                onChange={(e) =>
-                  setPassword(e.target.value)
-                }
+                onChange={(e) => setPassword(e.target.value)}
                 className="
                   w-full
                   border
@@ -185,9 +164,7 @@ export default function Registro() {
             >
               <UserPlus size={18} />
 
-              {loading
-                ? "Registrando..."
-                : "Registrarse"}
+              {loading ? "Registrando..." : "Registrarse"}
             </button>
           </form>
         </div>
@@ -195,4 +172,3 @@ export default function Registro() {
     </div>
   );
 }
-

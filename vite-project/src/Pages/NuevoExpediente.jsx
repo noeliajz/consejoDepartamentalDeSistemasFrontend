@@ -1,16 +1,13 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-import NavbarLateral from "../components/NavbarLateral";
+import NavbarHorizontalAdmin from "../components/NavbarHorizontalAdmin";
 
 import "../index.css";
 
 const NuevoExpediente = () => {
-
   // USUARIO LOGUEADO
-  const usuario = JSON.parse(
-    localStorage.getItem("usuario")
-  );
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
 
   // STATES
   const [numero, setNumero] = useState("");
@@ -30,11 +27,7 @@ const NuevoExpediente = () => {
 
   const [loading, setLoading] = useState(false);
 
-  const categorias = [
-    "Docentes",
-    "Alumnos",
-    "Otros"
-  ];
+  const categorias = ["Docentes", "Alumnos", "Otros"];
 
   const tiposTramite = [
     "Seleccionar...",
@@ -47,7 +40,6 @@ const NuevoExpediente = () => {
   // CREAR EXPEDIENTE
   const handleCrearExpediente = async () => {
     try {
-
       setLoading(true);
 
       const token = localStorage.getItem("token");
@@ -74,13 +66,13 @@ const NuevoExpediente = () => {
 
           estado,
 
-          usuario_id: usuario?.id
+          usuario_id: usuario?.id,
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
+            Authorization: `Bearer ${token}`,
+          },
+        },
       );
 
       console.log(response.data);
@@ -103,37 +95,25 @@ const NuevoExpediente = () => {
       setComision("");
 
       setEstado("Despacho");
-
     } catch (error) {
-
       console.error(error);
 
-      alert(
-        error.response?.data?.error ||
-        "Error al crear expediente"
-      );
-
+      alert(error.response?.data?.error || "Error al crear expediente");
     } finally {
-
       setLoading(false);
-
     }
   };
 
   return (
     <div className="min-h-screen bg-slate-100 flex">
-
       {/* SIDEBAR */}
-      <NavbarLateral user={{ role: "admin" }} />
+      <NavbarHorizontalAdmin user={{ role: "admin" }} />
 
       {/* CONTENIDO */}
       <main className="flex-1 ml-64 p-8">
-
         <div className="max-w-6xl mx-auto">
-
           {/* HEADER */}
           <div className="bg-gradient-to-r from-blue-700 to-blue-600 rounded-t-2xl p-6 flex items-center justify-between shadow-lg">
-
             <div>
               <h1 className="text-3xl font-bold text-white">
                 Nuevo expediente
@@ -147,16 +127,13 @@ const NuevoExpediente = () => {
 
           {/* FORM */}
           <div className="bg-white rounded-b-2xl p-8 shadow-xl">
-
             {/* IDENTIFICACIÓN */}
             <div className="mb-10">
-
               <h2 className="text-3xl font-bold text-slate-800 mb-6 border-b border-slate-200 pb-3">
                 IDENTIFICACIÓN DEL EXPEDIENTE
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
                 {/* NUMERO */}
                 <div>
                   <label className="block mb-2 text-sm font-semibold text-slate-700">
@@ -166,9 +143,7 @@ const NuevoExpediente = () => {
                   <input
                     type="text"
                     value={numero}
-                    onChange={(e) =>
-                      setNumero(e.target.value)
-                    }
+                    onChange={(e) => setNumero(e.target.value)}
                     placeholder="EXP-2026-001"
                     className="
                       w-full
@@ -191,9 +166,7 @@ const NuevoExpediente = () => {
                   <input
                     type="date"
                     value={fechaCreacion}
-                    onChange={(e) =>
-                      setFechaCreacion(e.target.value)
-                    }
+                    onChange={(e) => setFechaCreacion(e.target.value)}
                     className="
                       w-full
                       bg-white
@@ -215,9 +188,7 @@ const NuevoExpediente = () => {
                   <input
                     type="date"
                     value={fechaIngreso}
-                    onChange={(e) =>
-                      setFechaIngreso(e.target.value)
-                    }
+                    onChange={(e) => setFechaIngreso(e.target.value)}
                     className="
                       w-full
                       bg-white
@@ -234,13 +205,11 @@ const NuevoExpediente = () => {
 
             {/* DESCRIPCION */}
             <div>
-
               <h2 className="text-3xl font-bold text-slate-800 mb-6 border-b border-slate-200 pb-3">
                 DESCRIPCIÓN DEL TRÁMITE
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
                 {/* CATEGORIA */}
                 <div>
                   <label className="block mb-2 text-sm font-semibold text-slate-700">
@@ -249,9 +218,7 @@ const NuevoExpediente = () => {
 
                   <select
                     value={categoria}
-                    onChange={(e) =>
-                      setCategoria(e.target.value)
-                    }
+                    onChange={(e) => setCategoria(e.target.value)}
                     className="
                       w-full
                       bg-white
@@ -262,15 +229,10 @@ const NuevoExpediente = () => {
                       py-3
                     "
                   >
-                    <option value="">
-                      Seleccionar...
-                    </option>
+                    <option value="">Seleccionar...</option>
 
                     {categorias.map((item) => (
-                      <option
-                        key={item}
-                        value={item}
-                      >
+                      <option key={item} value={item}>
                         {item}
                       </option>
                     ))}
@@ -285,9 +247,7 @@ const NuevoExpediente = () => {
 
                   <select
                     value={tipoTramite}
-                    onChange={(e) =>
-                      setTipoTramite(e.target.value)
-                    }
+                    onChange={(e) => setTipoTramite(e.target.value)}
                     className="
                       w-full
                       bg-white
@@ -299,10 +259,7 @@ const NuevoExpediente = () => {
                     "
                   >
                     {tiposTramite.map((item) => (
-                      <option
-                        key={item}
-                        value={item}
-                      >
+                      <option key={item} value={item}>
                         {item}
                       </option>
                     ))}
@@ -313,11 +270,8 @@ const NuevoExpediente = () => {
 
             {/* INFORMACION */}
             <div className="mt-10">
-
               <div className="bg-slate-50 rounded-2xl border border-slate-200 p-8">
-
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
                   {/* SOLICITANTE */}
                   <div>
                     <label className="block mb-2 text-sm font-semibold text-slate-700">
@@ -327,9 +281,7 @@ const NuevoExpediente = () => {
                     <input
                       type="text"
                       value={solicitante}
-                      onChange={(e) =>
-                        setSolicitante(e.target.value)
-                      }
+                      onChange={(e) => setSolicitante(e.target.value)}
                       className="
                         w-full
                         bg-white
@@ -351,9 +303,7 @@ const NuevoExpediente = () => {
                     <input
                       type="text"
                       value={dniLegajo}
-                      onChange={(e) =>
-                        setDniLegajo(e.target.value)
-                      }
+                      onChange={(e) => setDniLegajo(e.target.value)}
                       className="
                         w-full
                         bg-white
@@ -369,7 +319,6 @@ const NuevoExpediente = () => {
 
                 {/* DESCRIPCION */}
                 <div className="mt-6">
-
                   <label className="block mb-2 text-sm font-semibold text-slate-700">
                     Descripción *
                   </label>
@@ -377,9 +326,7 @@ const NuevoExpediente = () => {
                   <textarea
                     rows="5"
                     value={descripcion}
-                    onChange={(e) =>
-                      setDescripcion(e.target.value)
-                    }
+                    onChange={(e) => setDescripcion(e.target.value)}
                     className="
                       w-full
                       bg-white
@@ -394,16 +341,13 @@ const NuevoExpediente = () => {
 
                 {/* COMISION */}
                 <div className="mt-6">
-
                   <label className="block mb-2 text-sm font-semibold text-slate-700">
                     Comisión asignada
                   </label>
 
                   <select
                     value={comision}
-                    onChange={(e) =>
-                      setComision(e.target.value)
-                    }
+                    onChange={(e) => setComision(e.target.value)}
                     className="
                       w-full
                       bg-white
@@ -414,13 +358,9 @@ const NuevoExpediente = () => {
                       py-3
                     "
                   >
-                    <option value="">
-                      Sin asignar
-                    </option>
+                    <option value="">Sin asignar</option>
 
-                    <option value="Enseñanza">
-                      Enseñanza
-                    </option>
+                    <option value="Enseñanza">Enseñanza</option>
 
                     <option value="Interpretación y Fundamento">
                       Interpretación y Fundamento
@@ -430,16 +370,13 @@ const NuevoExpediente = () => {
 
                 {/* ESTADO */}
                 <div className="mt-6">
-
                   <label className="block mb-2 text-sm font-semibold text-slate-700">
                     Estado del expediente
                   </label>
 
                   <select
                     value={estado}
-                    onChange={(e) =>
-                      setEstado(e.target.value)
-                    }
+                    onChange={(e) => setEstado(e.target.value)}
                     className="
                       w-full
                       bg-white
@@ -450,23 +387,16 @@ const NuevoExpediente = () => {
                       py-3
                     "
                   >
-                    <option value="Despacho">
-                      Despacho
-                    </option>
+                    <option value="Despacho">Despacho</option>
 
-                    <option value="Ingresado">
-                      Ingresado
-                    </option>
+                    <option value="Ingresado">Ingresado</option>
 
-                    <option value="Comisión">
-                      Comisión
-                    </option>
+                    <option value="Comisión">Comisión</option>
                   </select>
                 </div>
 
                 {/* BOTON */}
                 <div className="flex justify-end mt-10">
-
                   <button
                     onClick={handleCrearExpediente}
                     disabled={loading}
@@ -481,18 +411,11 @@ const NuevoExpediente = () => {
                       text-white
                     "
                   >
-                    {
-                      loading
-                        ? "Guardando..."
-                        : "Guardar expediente"
-                    }
+                    {loading ? "Guardando..." : "Guardar expediente"}
                   </button>
-
                 </div>
-
               </div>
             </div>
-
           </div>
         </div>
       </main>

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 
-import NavbarLateral from "../Components/NavbarLateral";
+import NavbarHorizontalAdmin from "../Components/NavbarHorizontalAdmin";
 
 import axios from "axios";
 
@@ -142,7 +142,7 @@ const Consejero = () => {
   return (
     <div className="flex bg-slate-100 min-h-screen">
       {/* Navbar */}
-      <NavbarLateral user={user} />
+      <NavbarHorizontalAdmin user={user} />
 
       {/* Contenido */}
       <main className="flex-1 ml-64 p-8">

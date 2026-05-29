@@ -6,7 +6,7 @@ import axios from "axios";
 
 import { useNavigate, useParams } from "react-router-dom";
 
-import NavbarLateral from "../Components/NavbarLateral";
+import NavbarHorizontalAdmin from "../Components/NavbarHorizontalAdmin";
 
 import { ArrowLeft, Save } from "lucide-react";
 
@@ -121,7 +121,7 @@ const EditarConsejero = () => {
 
   return (
     <div className="flex bg-slate-100 min-h-screen">
-      <NavbarLateral user={user} />
+      <NavbarHorizontalAdmin user={user} />
 
       <main className="flex-1 ml-64 p-8">
         {/* HEADER */}

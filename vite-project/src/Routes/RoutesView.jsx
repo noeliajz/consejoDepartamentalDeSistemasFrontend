@@ -37,11 +37,13 @@ import EditarConsejero from "../Pages/EditarConsejero";
 import NuevoConsejero from "../Pages/NuevoConsejero";
 import NuevoUsuario from "../Pages/NuevoUsuario";
 import EditarUsuario from "../Pages/EditarUsuario";
+import PaginaPrincipal from "../Pages/PaginaPrincipal";
 
 const RoutesView = () => {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
+      {/*       <Route path="/" element={<Home />} />
+       */}{" "}
       <Route path="/Login" element={<Login />} />
       <Route path="/Registro" element={<Registro />} />
       <Route path="/Drive" element={<Drive />} />
@@ -77,6 +79,8 @@ const RoutesView = () => {
       <Route path="/NuevoConsejero" element={<NuevoConsejero />} />
       <Route path="/NuevoUsuario" element={<NuevoUsuario />} />
       <Route path="/EditarUsuario/:id" element={<EditarUsuario />} />
+      <Route path="/" element={<PaginaPrincipal />} />
+      <Route path="/OlvidarContrasenia" element={<OlvidarContrasenia />} />
     </Routes>
   );
 };
