@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-import NavbarLateral from "../Components/NavbarLateral";
+import NavbarHorizontalAdmin from "../Components/NavbarHorizontalAdmin";
 
 import {
   Save,
@@ -67,7 +67,7 @@ const NuevaDisposicion = () => {
   return (
     <div className="flex bg-slate-100 min-h-screen">
       {/* Navbar */}
-      <NavbarLateral user={user} />
+      <NavbarHorizontalAdmin user={user} />
 
       {/* Contenido */}
       <main className="flex-1 ml-64 p-8">
@@ -141,21 +141,13 @@ const NuevaDisposicion = () => {
                   >
                     <option value="">Seleccione un tipo</option>
 
-                    <option value="Académica">
-                      Académica
-                    </option>
+                    <option value="Académica">Académica</option>
 
-                    <option value="De Consejo">
-                      De Consejo
-                    </option>
+                    <option value="De Consejo">De Consejo</option>
 
-                    <option value="De Dirección">
-                      De Dirección
-                    </option>
+                    <option value="De Dirección">De Dirección</option>
 
-                    <option value="Administrativa">
-                      Administrativa
-                    </option>
+                    <option value="Administrativa">Administrativa</option>
                   </select>
                 </div>
               </div>
@@ -202,17 +194,11 @@ const NuevaDisposicion = () => {
                     required
                     className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="Pendiente">
-                      Pendiente
-                    </option>
+                    <option value="Pendiente">Pendiente</option>
 
-                    <option value="Aprobada">
-                      Aprobada
-                    </option>
+                    <option value="Aprobada">Aprobada</option>
 
-                    <option value="En revisión">
-                      En revisión
-                    </option>
+                    <option value="En revisión">En revisión</option>
                   </select>
                 </div>
               </div>
@@ -252,9 +238,7 @@ const NuevaDisposicion = () => {
               >
                 <Save size={18} />
 
-                {loading
-                  ? "Guardando..."
-                  : "Guardar disposición"}
+                {loading ? "Guardando..." : "Guardar disposición"}
               </button>
             </div>
           </form>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import NavbarLateral from "../components/NavbarLateral";
+import NavbarHorizontalAdmin from "../components/NavbarHorizontalAdmin";
 import {
   Bell,
   UserX,
@@ -27,12 +27,48 @@ const MOCK_USER = { role: "admin", nombre: "María Sánchez" };
 
 // ─── lista de consejeros (reemplazar con fetch al backend) ───────────────────
 const CONSEJEROS = [
-  { id: 1, nombre: "Carlos Mendoza",    telefono: "3814151917", email: "c.mendoza@utn.edu.ar",    activo: true  },
-  { id: 2, nombre: "Laura Fernández",   telefono: "3816501006", email: "l.fernandez@utn.edu.ar",  activo: true  },
-  { id: 3, nombre: "Roberto Suárez",    telefono: "3814755118", email: "r.suarez@utn.edu.ar",     activo: true  },
-  { id: 4, nombre: "Diana García",      telefono: "3815001234", email: "d.garcia@utn.edu.ar",     activo: false },
-  { id: 5, nombre: "Marcelo Torres",    telefono: "3814889900", email: "m.torres@utn.edu.ar",     activo: true  },
-  { id: 6, nombre: "Valeria Romero",    telefono: "3816772233", email: "v.romero@utn.edu.ar",     activo: true  },
+  {
+    id: 1,
+    nombre: "Carlos Mendoza",
+    telefono: "3814151917",
+    email: "c.mendoza@utn.edu.ar",
+    activo: true,
+  },
+  {
+    id: 2,
+    nombre: "Laura Fernández",
+    telefono: "3816501006",
+    email: "l.fernandez@utn.edu.ar",
+    activo: true,
+  },
+  {
+    id: 3,
+    nombre: "Roberto Suárez",
+    telefono: "3814755118",
+    email: "r.suarez@utn.edu.ar",
+    activo: true,
+  },
+  {
+    id: 4,
+    nombre: "Diana García",
+    telefono: "3815001234",
+    email: "d.garcia@utn.edu.ar",
+    activo: false,
+  },
+  {
+    id: 5,
+    nombre: "Marcelo Torres",
+    telefono: "3814889900",
+    email: "m.torres@utn.edu.ar",
+    activo: true,
+  },
+  {
+    id: 6,
+    nombre: "Valeria Romero",
+    telefono: "3816772233",
+    email: "v.romero@utn.edu.ar",
+    activo: true,
+  },
 ];
 
 // ─── datos de ejemplo ────────────────────────────────────────────────────────
@@ -174,10 +210,10 @@ const ModalNotificar = ({ tipo, onClose, onEnviado }) => {
   const consejerosFiltrados = CONSEJEROS.filter((c) => c.activo);
 
   const [seleccionados, setSeleccionados] = useState(
-    consejerosFiltrados.map((c) => c.id)
+    consejerosFiltrados.map((c) => c.id),
   );
   const [mensaje, setMensaje] = useState(
-    "Estimado/a consejero/a,\n\nLe informamos que hay una nueva notificación del Consejo Directivo - UTN Facultad Regional.\n\nPor favor, tome las acciones correspondientes.\n\nSaludos,\nSecretaría del Consejo Directivo"
+    "Estimado/a consejero/a,\n\nLe informamos que hay una nueva notificación del Consejo Directivo - UTN Facultad Regional.\n\nPor favor, tome las acciones correspondientes.\n\nSaludos,\nSecretaría del Consejo Directivo",
   );
   const [estado, setEstado] = useState("idle"); // idle | enviando | enviado
   const [progresoActual, setProgresoActual] = useState(0);
@@ -185,7 +221,7 @@ const ModalNotificar = ({ tipo, onClose, onEnviado }) => {
 
   const toggleSeleccion = (id) => {
     setSeleccionados((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
   };
 
@@ -232,7 +268,10 @@ const ModalNotificar = ({ tipo, onClose, onEnviado }) => {
       const bcc = consejerosSel.map((c) => c.email).join(",");
       const asunto = encodeURIComponent("Notificación - Consejo Directivo UTN");
       const cuerpo = encodeURIComponent(mensaje);
-      window.open(`mailto:?bcc=${bcc}&subject=${asunto}&body=${cuerpo}`, "_blank");
+      window.open(
+        `mailto:?bcc=${bcc}&subject=${asunto}&body=${cuerpo}`,
+        "_blank",
+      );
 
       setTimeout(() => {
         setProgresoActual(consejerosSel.length);
@@ -253,7 +292,6 @@ const ModalNotificar = ({ tipo, onClose, onEnviado }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden max-h-[90vh] flex flex-col">
-
         {/* cabecera */}
         <div
           className={`px-6 py-4 flex items-center justify-between flex-shrink-0 ${
@@ -295,7 +333,6 @@ const ModalNotificar = ({ tipo, onClose, onEnviado }) => {
 
         {/* cuerpo scrolleable */}
         <div className="px-6 py-5 space-y-4 overflow-y-auto flex-1">
-
           {/* selector de consejeros */}
           <div>
             <div className="flex items-center justify-between mb-2">
@@ -332,7 +369,8 @@ const ModalNotificar = ({ tipo, onClose, onEnviado }) => {
                   className={esWsp ? "text-green-600" : "text-blue-600"}
                 />
                 <span className="text-sm font-semibold text-gray-800">
-                  {seleccionados.length} de {consejerosFiltrados.length} consejeros activos
+                  {seleccionados.length} de {consejerosFiltrados.length}{" "}
+                  consejeros activos
                 </span>
               </div>
               <button
@@ -481,8 +519,8 @@ const ModalNotificar = ({ tipo, onClose, onEnviado }) => {
                 estado !== "idle" || consejerosSel.length === 0
                   ? "bg-gray-300 cursor-not-allowed"
                   : esWsp
-                  ? "bg-green-500 hover:bg-green-600"
-                  : "bg-blue-700 hover:bg-blue-800"
+                    ? "bg-green-500 hover:bg-green-600"
+                    : "bg-blue-700 hover:bg-blue-800"
               }`}
           >
             {estado === "enviando" ? (
@@ -495,7 +533,8 @@ const ModalNotificar = ({ tipo, onClose, onEnviado }) => {
               </>
             ) : esWsp ? (
               <>
-                <WhatsAppIcon size={14} /> Enviar a {consejerosSel.length} consejero
+                <WhatsAppIcon size={14} /> Enviar a {consejerosSel.length}{" "}
+                consejero
                 {consejerosSel.length !== 1 ? "s" : ""}
               </>
             ) : (
@@ -590,10 +629,11 @@ const Notificacion = ({ user }) => {
 
   const marcar = (id) =>
     setNotifs((p) =>
-      p.map((n) => (n.id === id ? { ...n, leida: !n.leida } : n))
+      p.map((n) => (n.id === id ? { ...n, leida: !n.leida } : n)),
     );
   const eliminar = (id) => setNotifs((p) => p.filter((n) => n.id !== id));
-  const marcarTodas = () => setNotifs((p) => p.map((n) => ({ ...n, leida: true })));
+  const marcarTodas = () =>
+    setNotifs((p) => p.map((n) => ({ ...n, leida: true })));
   const eliminarLeidas = () => setNotifs((p) => p.filter((n) => !n.leida));
 
   const handleEnviado = (tipo, cantidad) => {
@@ -626,7 +666,7 @@ const Notificacion = ({ user }) => {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <NavbarLateral user={userParaNavbar} />
+      <NavbarHorizontalAdmin user={userParaNavbar} />
 
       {/* Modal */}
       {modalTipo && (

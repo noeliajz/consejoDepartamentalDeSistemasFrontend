@@ -1,7 +1,7 @@
 // src/pages/Disposicion.jsx
 
 import React, { useEffect, useState } from "react";
-import NavbarLateral from "../Components/NavbarLateral";
+import NavbarHorizontalAdmin from "../Components/NavbarHorizontalAdmin";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -41,56 +41,49 @@ const Disposicion = () => {
   useEffect(() => {
     obtenerDisposiciones();
   }, []);
-// Eliminar disposición
-const eliminarDisposicion = async (id) => {
-  const confirmar = window.confirm(
-    "¿Desea eliminar esta disposición?"
-  );
+  // Eliminar disposición
+  const eliminarDisposicion = async (id) => {
+    const confirmar = window.confirm("¿Desea eliminar esta disposición?");
 
-  if (!confirmar) return;
+    if (!confirmar) return;
 
-  try {
-    await axios.delete(`${API}/${id}`);
+    try {
+      await axios.delete(`${API}/${id}`);
 
-    alert("Disposición eliminada correctamente");
+      alert("Disposición eliminada correctamente");
 
-    obtenerDisposiciones();
-  } catch (error) {
-    console.error(
-      "Error al eliminar disposición:",
-      error
-    );
+      obtenerDisposiciones();
+    } catch (error) {
+      console.error("Error al eliminar disposición:", error);
 
-    alert("Error al eliminar la disposición");
-  }
-};
+      alert("Error al eliminar la disposición");
+    }
+  };
 
-// Generar PDF
-const generarPDF = (disp) => {
-  window.print();
-};
+  // Generar PDF
+  const generarPDF = (disp) => {
+    window.print();
+  };
   // Filtrar búsqueda
   const disposicionesFiltradas = disposiciones.filter((disp) =>
     `${disp.numero} ${disp.tipo} ${disp.descripcion}`
       .toLowerCase()
-      .includes(busqueda.toLowerCase())
+      .includes(busqueda.toLowerCase()),
   );
 
   // Contadores
   const totalDisposiciones = disposiciones.length;
 
-  const aprobadas = disposiciones.filter(
-    (d) => d.estado === "Aprobada"
-  ).length;
+  const aprobadas = disposiciones.filter((d) => d.estado === "Aprobada").length;
 
   const pendientes = disposiciones.filter(
-    (d) => d.estado === "Pendiente"
+    (d) => d.estado === "Pendiente",
   ).length;
 
   return (
     <div className="flex bg-slate-100 min-h-screen">
       {/* Navbar */}
-      <NavbarLateral user={user} />
+      <NavbarHorizontalAdmin user={user} />
 
       {/* Contenido */}
       <main className="flex-1 ml-64 p-8">
@@ -112,15 +105,15 @@ const generarPDF = (disp) => {
               Notificar
             </button>
 
-                      <button
-            onClick={() => navigate("/NuevaDisposicion")}
-            className="flex items-center gap-2 px-5 py-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white shadow-md transition"
-          >
-            <Plus size={18} />
-            Nueva disposición
-          </button>
-                    </div>
-                  </div>
+            <button
+              onClick={() => navigate("/NuevaDisposicion")}
+              className="flex items-center gap-2 px-5 py-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white shadow-md transition"
+            >
+              <Plus size={18} />
+              Nueva disposición
+            </button>
+          </div>
+        </div>
 
         {/* Cards resumen */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -208,32 +201,28 @@ const generarPDF = (disp) => {
                       </span>
                     </td>
 
-                    <td className="py-5 text-slate-600">
-                      {disp.descripcion}
-                    </td>
+                    <td className="py-5 text-slate-600">{disp.descripcion}</td>
 
-                    <td className="py-5 text-slate-600">
-                      {disp.fecha}
-                    </td>
+                    <td className="py-5 text-slate-600">{disp.fecha}</td>
 
                     <td className="py-5">
                       <EstadoBadge estado={disp.estado} />
                     </td>
 
                     <td className="py-5">
-  <div
-    className="
+                      <div
+                        className="
       flex
       items-center
       gap-3
       flex-wrap
     "
-  >
-    <button
-      onClick={() =>
-        navigate(`/EditarDisposicion/${disp._id}`)
-      }
-      className="
+                      >
+                        <button
+                          onClick={() =>
+                            navigate(`/EditarDisposicion/${disp._id}`)
+                          }
+                          className="
         rounded-lg
         border
         border-yellow-200
@@ -246,13 +235,13 @@ const generarPDF = (disp) => {
         hover:bg-yellow-100
         transition
       "
-    >
-      Editar
-    </button>
+                        >
+                          Editar
+                        </button>
 
-    <button
-      onClick={() => generarPDF(disp)}
-      className="
+                        <button
+                          onClick={() => generarPDF(disp)}
+                          className="
         flex
         items-center
         gap-2
@@ -268,17 +257,14 @@ const generarPDF = (disp) => {
         hover:bg-blue-100
         transition
       "
-    >
-      <Download size={16} />
+                        >
+                          <Download size={16} />
+                          PDF
+                        </button>
 
-      PDF
-    </button>
-
-    <button
-      onClick={() =>
-        eliminarDisposicion(disp._id)
-      }
-      className="
+                        <button
+                          onClick={() => eliminarDisposicion(disp._id)}
+                          className="
         flex
         items-center
         gap-2
@@ -294,13 +280,12 @@ const generarPDF = (disp) => {
         hover:bg-red-100
         transition
       "
-    >
-      <Trash2 size={16} />
-
-      Eliminar
-    </button>
-  </div>
-</td>
+                        >
+                          <Trash2 size={16} />
+                          Eliminar
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
 
@@ -329,9 +314,7 @@ const CardResumen = ({ titulo, valor, icon }) => {
       <div>
         <p className="text-slate-500 text-sm">{titulo}</p>
 
-        <h3 className="text-3xl font-bold text-slate-800 mt-2">
-          {valor}
-        </h3>
+        <h3 className="text-3xl font-bold text-slate-800 mt-2">{valor}</h3>
       </div>
 
       <div className="w-14 h-14 rounded-2xl bg-blue-100 flex items-center justify-center text-blue-700">

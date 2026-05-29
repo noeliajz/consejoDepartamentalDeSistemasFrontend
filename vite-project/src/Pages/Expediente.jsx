@@ -3,17 +3,11 @@ import { useNavigate } from "react-router-dom";
 
 import axios from "axios";
 
-import {
-  Search,
-  ChevronDown,
-  Bell,
-  Plus,
-} from "lucide-react";
+import { Search, ChevronDown, Bell, Plus } from "lucide-react";
 
-import NavbarLateral from "../components/NavbarLateral";
+import NavbarHorizontalAdmin from "../components/NavbarHorizontalAdmin";
 
 export default function Expediente() {
-
   const navigate = useNavigate();
 
   // EXPEDIENTES DESDE MONGODB
@@ -23,8 +17,9 @@ export default function Expediente() {
   const [estadoSeleccionado, setEstadoSeleccionado] =
     useState("Todos los estados");
 
-  const [categoriaSeleccionada, setCategoriaSeleccionada] =
-    useState("Todas las categorías");
+  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(
+    "Todas las categorías",
+  );
 
   const [openEstado, setOpenEstado] = useState(false);
 
@@ -41,25 +36,15 @@ export default function Expediente() {
     "Rechazado",
   ];
 
-  const categorias = [
-    "Todas las categorías",
-    "Docentes",
-    "Alumnos",
-    "Otros",
-  ];
+  const categorias = ["Todas las categorías", "Docentes", "Alumnos", "Otros"];
 
   // OBTENER EXPEDIENTES
   const obtenerExpedientes = async () => {
     try {
-
-      const response = await axios.get(
-        "http://127.0.0.1:5000/api/expedientes"
-      );
+      const response = await axios.get("http://127.0.0.1:5000/api/expedientes");
 
       setExpedientes(response.data);
-
     } catch (error) {
-
       console.error(error);
 
       alert("Error al obtener expedientes");
@@ -69,23 +54,16 @@ export default function Expediente() {
   // ELIMINAR
   const eliminarExpediente = async (id) => {
     try {
-
-      const confirmar = window.confirm(
-        "¿Deseas eliminar este expediente?"
-      );
+      const confirmar = window.confirm("¿Deseas eliminar este expediente?");
 
       if (!confirmar) return;
 
-      await axios.delete(
-        `http://127.0.0.1:5000/api/expedientes/${id}`
-      );
+      await axios.delete(`http://127.0.0.1:5000/api/expedientes/${id}`);
 
       alert("Expediente eliminado");
 
       obtenerExpedientes();
-
     } catch (error) {
-
       console.error(error);
 
       alert("Error al eliminar expediente");
@@ -99,9 +77,7 @@ export default function Expediente() {
 
   // COLOR ESTADO
   const obtenerColorEstado = (estado) => {
-
     switch (estado) {
-
       case "Despacho":
         return "bg-yellow-100 text-yellow-800";
 
@@ -124,7 +100,6 @@ export default function Expediente() {
 
   // FILTROS
   const expedientesFiltrados = expedientes.filter((exp) => {
-
     const coincideBusqueda =
       exp.numero?.toLowerCase().includes(busqueda.toLowerCase()) ||
       exp.descripcion?.toLowerCase().includes(busqueda.toLowerCase());
@@ -137,25 +112,18 @@ export default function Expediente() {
       categoriaSeleccionada === "Todas las categorías" ||
       exp.categoria === categoriaSeleccionada;
 
-    return (
-      coincideBusqueda &&
-      coincideEstado &&
-      coincideCategoria
-    );
+    return coincideBusqueda && coincideEstado && coincideCategoria;
   });
 
   return (
     <div className="min-h-screen bg-gray-100 flex">
-
       {/* Sidebar */}
-      <NavbarLateral user={{ role: "admin" }} />
+      <NavbarHorizontalAdmin user={{ role: "admin" }} />
 
       {/* Main */}
       <main className="flex-1 ml-64 p-8">
-
         {/* Header */}
         <div className="flex items-start justify-between mb-10">
-
           <div>
             <h1 className="text-4xl font-bold text-gray-900 mb-2">
               Expedientes
@@ -167,7 +135,6 @@ export default function Expediente() {
           </div>
 
           <div className="flex items-center gap-6">
-
             <button className="relative text-gray-700 hover:text-black transition">
               <Bell size={22} />
 
@@ -175,9 +142,7 @@ export default function Expediente() {
             </button>
 
             <button
-              onClick={() =>
-                navigate("/NuevoExpediente")
-              }
+              onClick={() => navigate("/NuevoExpediente")}
               className="
                 bg-blue-900
                 hover:bg-blue-800
@@ -201,12 +166,9 @@ export default function Expediente() {
 
         {/* FILTROS */}
         <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-6 mb-8">
-
           <div className="flex flex-col lg:flex-row gap-4 lg:items-center lg:justify-between">
-
             {/* BUSCAR */}
             <div className="relative w-full lg:max-w-sm">
-
               <Search
                 size={18}
                 className="
@@ -222,9 +184,7 @@ export default function Expediente() {
                 type="text"
                 placeholder="Buscar expediente..."
                 value={busqueda}
-                onChange={(e) =>
-                  setBusqueda(e.target.value)
-                }
+                onChange={(e) => setBusqueda(e.target.value)}
                 className="
                   w-full
                   rounded-xl
@@ -243,10 +203,8 @@ export default function Expediente() {
 
             {/* DROPDOWNS */}
             <div className="flex flex-wrap gap-4">
-
               {/* ESTADO */}
               <div className="relative">
-
                 <button
                   onClick={() => {
                     setOpenEstado(!openEstado);
@@ -273,7 +231,8 @@ export default function Expediente() {
                 </button>
 
                 {openEstado && (
-                  <div className="
+                  <div
+                    className="
                     absolute
                     top-full
                     left-0
@@ -286,8 +245,8 @@ export default function Expediente() {
                     shadow-lg
                     overflow-hidden
                     z-50
-                  ">
-
+                  "
+                  >
                     {estados.map((estado) => (
                       <button
                         key={estado}
@@ -320,7 +279,6 @@ export default function Expediente() {
 
               {/* CATEGORIA */}
               <div className="relative">
-
                 <button
                   onClick={() => {
                     setOpenCategoria(!openCategoria);
@@ -347,7 +305,8 @@ export default function Expediente() {
                 </button>
 
                 {openCategoria && (
-                  <div className="
+                  <div
+                    className="
                     absolute
                     top-full
                     left-0
@@ -360,8 +319,8 @@ export default function Expediente() {
                     shadow-lg
                     overflow-hidden
                     z-50
-                  ">
-
+                  "
+                  >
                     {categorias.map((categoria) => (
                       <button
                         key={categoria}
@@ -396,17 +355,19 @@ export default function Expediente() {
         </div>
 
         {/* TABLA */}
-        <div className="
+        <div
+          className="
           bg-white
           rounded-3xl
           border
           border-gray-200
           shadow-sm
           overflow-hidden
-        ">
-
+        "
+        >
           {/* HEADER */}
-          <div className="
+          <div
+            className="
             grid
             grid-cols-12
             gap-4
@@ -418,36 +379,23 @@ export default function Expediente() {
             font-semibold
             text-gray-500
             uppercase
-          ">
+          "
+          >
+            <div className="col-span-2">N° expediente</div>
 
-            <div className="col-span-2">
-              N° expediente
-            </div>
+            <div className="col-span-4">Descripción</div>
 
-            <div className="col-span-4">
-              Descripción
-            </div>
+            <div className="col-span-1">Categoría</div>
 
-            <div className="col-span-1">
-              Categoría
-            </div>
+            <div className="col-span-1">Ingreso</div>
 
-            <div className="col-span-1">
-              Ingreso
-            </div>
+            <div className="col-span-2">Estado</div>
 
-            <div className="col-span-2">
-              Estado
-            </div>
-
-            <div className="col-span-2 text-center">
-              Acciones
-            </div>
+            <div className="col-span-2 text-center">Acciones</div>
           </div>
 
           {/* FILAS */}
           {expedientesFiltrados.map((exp) => (
-
             <div
               key={exp._id}
               className="
@@ -463,17 +411,15 @@ export default function Expediente() {
                 transition
               "
             >
-
               <div className="col-span-2 font-medium text-gray-800">
                 {exp.numero}
               </div>
 
-              <div className="col-span-4 text-gray-700">
-                {exp.descripcion}
-              </div>
+              <div className="col-span-4 text-gray-700">{exp.descripcion}</div>
 
               <div className="col-span-1">
-                <span className="
+                <span
+                  className="
                   rounded-full
                   bg-gray-100
                   px-3
@@ -481,7 +427,8 @@ export default function Expediente() {
                   text-xs
                   font-medium
                   text-gray-700
-                ">
+                "
+                >
                   {exp.categoria}
                 </span>
               </div>
@@ -491,33 +438,33 @@ export default function Expediente() {
               </div>
 
               <div className="col-span-2">
-
-                <span className={`
+                <span
+                  className={`
                   rounded-full
                   px-3
                   py-1
                   text-xs
                   font-semibold
                   ${obtenerColorEstado(exp.estado)}
-                `}>
+                `}
+                >
                   {exp.estado}
                 </span>
               </div>
 
               {/* ACCIONES */}
-              <div className="
+              <div
+                className="
                 col-span-2
                 flex
                 items-center
                 justify-center
                 gap-2
-              ">
-
+              "
+              >
                 {/* VER */}
                 <button
-                  onClick={() =>
-                    navigate(`/expediente/${exp._id}`)
-                  }
+                  onClick={() => navigate(`/expediente/${exp._id}`)}
                   className="
                     rounded-lg
                     border
@@ -536,9 +483,7 @@ export default function Expediente() {
 
                 {/* EDITAR */}
                 <button
-                  onClick={() =>
-                    navigate(`/EditarExpediente/${exp._id}`)
-                  }
+                  onClick={() => navigate(`/EditarExpediente/${exp._id}`)}
                   className="
                     rounded-lg
                     border
@@ -557,9 +502,7 @@ export default function Expediente() {
 
                 {/* ELIMINAR */}
                 <button
-                  onClick={() =>
-                    eliminarExpediente(exp._id)
-                  }
+                  onClick={() => eliminarExpediente(exp._id)}
                   className="
                     rounded-lg
                     border
@@ -575,11 +518,9 @@ export default function Expediente() {
                 >
                   Eliminar
                 </button>
-
               </div>
             </div>
           ))}
-
         </div>
       </main>
     </div>

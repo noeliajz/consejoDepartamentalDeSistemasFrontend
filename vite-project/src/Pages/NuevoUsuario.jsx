@@ -6,7 +6,7 @@ import axios from "axios";
 
 import { useNavigate } from "react-router-dom";
 
-import NavbarLateral from "../Components/NavbarLateral";
+import NavbarHorizontalAdmin from "../Components/NavbarHorizontalAdmin";
 
 import { Save, ArrowLeft, User, Mail, Phone, ShieldCheck } from "lucide-react";
 
@@ -69,7 +69,7 @@ const NuevoUsuario = () => {
   return (
     <div className="flex bg-slate-100 min-h-screen">
       {/* NAVBAR */}
-      <NavbarLateral user={user} />
+      <NavbarHorizontalAdmin user={user} />
 
       {/* CONTENIDO */}
       <main className="flex-1 ml-64 p-8">

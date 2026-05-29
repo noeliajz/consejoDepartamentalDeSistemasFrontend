@@ -3,33 +3,23 @@ import { useNavigate } from "react-router-dom";
 
 import axios from "axios";
 
-import {
-  CalendarDays,
-  Clock3,
-  ChevronDown,
-  ArrowUpRight,
-} from "lucide-react";
+import { CalendarDays, Clock3, ChevronDown, ArrowUpRight } from "lucide-react";
 
-import NavbarLateral from "../components/NavbarLateral";
+import NavbarHorizontalAdmin from "../components/NavbarHorizontalAdmin";
 
 export default function Trazabilidad() {
-
   const navigate = useNavigate();
 
   // EXPEDIENTES
   const [expedientes, setExpedientes] = useState([]);
 
   // EXPEDIENTE SELECCIONADO
-  const [expedienteSeleccionado, setExpedienteSeleccionado] =
-    useState(null);
+  const [expedienteSeleccionado, setExpedienteSeleccionado] = useState(null);
 
   // OBTENER EXPEDIENTES
   const obtenerExpedientes = async () => {
     try {
-
-      const response = await axios.get(
-        "http://127.0.0.1:5000/api/expedientes"
-      );
+      const response = await axios.get("http://127.0.0.1:5000/api/expedientes");
 
       setExpedientes(response.data);
 
@@ -37,9 +27,7 @@ export default function Trazabilidad() {
       if (response.data.length > 0) {
         setExpedienteSeleccionado(response.data[0]);
       }
-
     } catch (error) {
-
       console.error(error);
 
       alert("Error al obtener expedientes");
@@ -52,9 +40,7 @@ export default function Trazabilidad() {
 
   // COLOR ESTADO
   const obtenerColorEstado = (estado) => {
-
     switch (estado) {
-
       case "Despacho":
         return "bg-yellow-100 text-yellow-700";
 
@@ -77,14 +63,12 @@ export default function Trazabilidad() {
 
   // TRAZABILIDAD AUTOMÁTICA
   const generarEventos = (exp) => {
-
     if (!exp) return [];
 
     const eventos = [
       {
         titulo: "Expediente creado",
-        descripcion:
-          "Mesa de entrada registró el expediente",
+        descripcion: "Mesa de entrada registró el expediente",
         fecha: exp.fecha_creacion,
       },
     ];
@@ -93,8 +77,7 @@ export default function Trazabilidad() {
     if (exp.comision) {
       eventos.push({
         titulo: `Asignado a comisión ${exp.comision}`,
-        descripcion:
-          "Expediente enviado para análisis",
+        descripcion: "Expediente enviado para análisis",
         fecha: exp.fecha_ingreso,
       });
     }
@@ -102,8 +85,7 @@ export default function Trazabilidad() {
     // estado
     eventos.push({
       titulo: `Estado actual: ${exp.estado}`,
-      descripcion:
-        "Seguimiento actualizado automáticamente",
+      descripcion: "Seguimiento actualizado automáticamente",
       fecha: exp.fecha_ingreso,
     });
 
@@ -112,21 +94,15 @@ export default function Trazabilidad() {
 
   return (
     <div className="min-h-screen bg-gray-100 flex">
-
       {/* SIDEBAR */}
-      <NavbarLateral user={{ role: "admin" }} />
+      <NavbarHorizontalAdmin user={{ role: "admin" }} />
 
       {/* MAIN */}
       <main className="flex-1 ml-64 p-8">
-
         <div className="max-w-7xl mx-auto">
-
           {/* HEADER */}
           <div className="mb-8">
-
-            <h1 className="text-4xl font-bold text-gray-900">
-              Trazabilidad
-            </h1>
+            <h1 className="text-4xl font-bold text-gray-900">Trazabilidad</h1>
 
             <p className="text-gray-500 mt-2">
               Seguimiento de expedientes del consejo directivo
@@ -135,15 +111,11 @@ export default function Trazabilidad() {
 
           {/* GRID */}
           <div className="grid grid-cols-12 gap-6">
-
             {/* PANEL IZQUIERDO */}
             <div className="col-span-12 lg:col-span-4">
-
               <div className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden">
-
                 {/* HEADER */}
                 <div className="flex items-center justify-between p-6 border-b border-gray-100">
-
                   <div>
                     <h2 className="text-3xl font-bold text-gray-900">
                       Expedientes
@@ -151,9 +123,7 @@ export default function Trazabilidad() {
                   </div>
 
                   <button
-                    onClick={() =>
-                      navigate("/Expediente")
-                    }
+                    onClick={() => navigate("/Expediente")}
                     className="text-blue-600 font-semibold flex items-center gap-1 hover:text-blue-800"
                   >
                     Ver todos
@@ -163,14 +133,10 @@ export default function Trazabilidad() {
 
                 {/* LISTA */}
                 <div className="max-h-[700px] overflow-y-auto">
-
                   {expedientes.map((exp) => (
-
                     <button
                       key={exp._id}
-                      onClick={() =>
-                        setExpedienteSeleccionado(exp)
-                      }
+                      onClick={() => setExpedienteSeleccionado(exp)}
                       className={`
                         w-full
                         text-left
@@ -186,57 +152,46 @@ export default function Trazabilidad() {
                         }
                       `}
                     >
-
                       <h3 className="font-bold text-xl text-gray-900">
                         {exp.numero}
                       </h3>
 
-                      <p className="text-gray-600 mt-2">
-                        {exp.descripcion}
-                      </p>
+                      <p className="text-gray-600 mt-2">{exp.descripcion}</p>
 
                       <div className="mt-4">
-                        <span className={`
+                        <span
+                          className={`
                           px-4
                           py-1
                           rounded-full
                           text-sm
                           font-semibold
                           ${obtenerColorEstado(exp.estado)}
-                        `}>
+                        `}
+                        >
                           {exp.estado}
                         </span>
                       </div>
                     </button>
                   ))}
-
                 </div>
               </div>
             </div>
 
             {/* PANEL DERECHO */}
             <div className="col-span-12 lg:col-span-8">
-
               <div className="bg-white rounded-3xl shadow-sm border border-gray-200 p-6">
-
                 {/* SELECT */}
                 <div className="flex flex-col lg:flex-row gap-4 justify-between mb-8">
-
                   <div className="relative w-full">
-
                     <select
                       value={expedienteSeleccionado?._id || ""}
                       onChange={(e) => {
-
-                        const encontrado =
-                          expedientes.find(
-                            (exp) =>
-                              exp._id === e.target.value
-                          );
-
-                        setExpedienteSeleccionado(
-                          encontrado
+                        const encontrado = expedientes.find(
+                          (exp) => exp._id === e.target.value,
                         );
+
+                        setExpedienteSeleccionado(encontrado);
                       }}
                       className="
                         w-full
@@ -251,12 +206,8 @@ export default function Trazabilidad() {
                         text-gray-700
                       "
                     >
-
                       {expedientes.map((exp) => (
-                        <option
-                          key={exp._id}
-                          value={exp._id}
-                        >
+                        <option key={exp._id} value={exp._id}>
                           {exp.numero} — {exp.descripcion}
                         </option>
                       ))}
@@ -275,9 +226,7 @@ export default function Trazabilidad() {
                   </div>
 
                   <button
-                    onClick={() =>
-                      navigate("/Expediente")
-                    }
+                    onClick={() => navigate("/Expediente")}
                     className="
                       px-6
                       py-4
@@ -295,7 +244,6 @@ export default function Trazabilidad() {
 
                 {/* INFO */}
                 {expedienteSeleccionado && (
-
                   <>
                     <h2 className="text-5xl font-bold text-gray-900">
                       {expedienteSeleccionado.numero}
@@ -307,30 +255,25 @@ export default function Trazabilidad() {
 
                     {/* TIMELINE */}
                     <div className="relative">
-
                       {/* LINEA */}
-                      <div className="
+                      <div
+                        className="
                         absolute
                         left-5
                         top-0
                         bottom-0
                         w-[2px]
                         bg-gray-200
-                      " />
+                      "
+                      />
 
                       <div className="space-y-8">
-
-                        {generarEventos(
-                          expedienteSeleccionado
-                        ).map((evento, index) => (
-
-                          <div
-                            key={index}
-                            className="relative flex gap-6"
-                          >
-
-                            {/* ICONO */}
-                            <div className="
+                        {generarEventos(expedienteSeleccionado).map(
+                          (evento, index) => (
+                            <div key={index} className="relative flex gap-6">
+                              {/* ICONO */}
+                              <div
+                                className="
                               z-10
                               w-10
                               h-10
@@ -341,56 +284,55 @@ export default function Trazabilidad() {
                               justify-center
                               text-white
                               shadow-lg
-                            ">
-                              <Clock3 size={18} />
-                            </div>
+                            "
+                              >
+                                <Clock3 size={18} />
+                              </div>
 
-                            {/* CARD */}
-                            <div className="
+                              {/* CARD */}
+                              <div
+                                className="
                               flex-1
                               bg-gray-50
                               border
                               border-gray-200
                               rounded-3xl
                               p-8
-                            ">
+                            "
+                              >
+                                <div className="flex items-start justify-between gap-4">
+                                  <div>
+                                    <h3 className="text-2xl font-bold text-gray-900">
+                                      {evento.titulo}
+                                    </h3>
 
-                              <div className="flex items-start justify-between gap-4">
+                                    <p className="text-gray-600 mt-4 text-lg">
+                                      {evento.descripcion}
+                                    </p>
+                                  </div>
 
-                                <div>
-
-                                  <h3 className="text-2xl font-bold text-gray-900">
-                                    {evento.titulo}
-                                  </h3>
-
-                                  <p className="text-gray-600 mt-4 text-lg">
-                                    {evento.descripcion}
-                                  </p>
-                                </div>
-
-                                <div className="
+                                  <div
+                                    className="
                                   flex
                                   items-center
                                   gap-2
                                   text-gray-500
                                   whitespace-nowrap
-                                ">
-                                  <CalendarDays size={16} />
+                                "
+                                  >
+                                    <CalendarDays size={16} />
 
-                                  <span>
-                                    {evento.fecha}
-                                  </span>
+                                    <span>{evento.fecha}</span>
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        ))}
-
+                          ),
+                        )}
                       </div>
                     </div>
                   </>
                 )}
-
               </div>
             </div>
           </div>

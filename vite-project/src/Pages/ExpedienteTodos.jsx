@@ -1,14 +1,9 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-import {
-  ArrowLeft,
-  Eye,
-  Pencil,
-  Trash2,
-} from "lucide-react";
+import { ArrowLeft, Eye, Pencil, Trash2 } from "lucide-react";
 
-import NavbarLateral from "../components/NavbarLateral";
+import NavbarHorizontalAdmin from "../components/NavbarHorizontalAdmin";
 
 const expedientes = [
   {
@@ -76,7 +71,7 @@ const ExpedienteTodos = () => {
   return (
     <div className="min-h-screen bg-slate-100">
       {/* Sidebar */}
-      <NavbarLateral user={{ role: "admin" }} />
+      <NavbarHorizontalAdmin user={{ role: "admin" }} />
 
       {/* Main */}
       <main className="ml-64 p-8">
@@ -116,9 +111,7 @@ const ExpedienteTodos = () => {
 
             <div className="col-span-1">Fecha</div>
 
-            <div className="col-span-1 text-center">
-              Acciones
-            </div>
+            <div className="col-span-1 text-center">Acciones</div>
           </div>
 
           {/* Rows */}
@@ -131,9 +124,7 @@ const ExpedienteTodos = () => {
                 {exp.numero}
               </div>
 
-              <div className="col-span-4 text-slate-700">
-                {exp.titulo}
-              </div>
+              <div className="col-span-4 text-slate-700">{exp.titulo}</div>
 
               <div className="col-span-2">
                 <span className="bg-slate-100 text-slate-700 text-xs font-medium px-3 py-1 rounded-full">
@@ -144,7 +135,7 @@ const ExpedienteTodos = () => {
               <div className="col-span-2">
                 <span
                   className={`text-xs font-semibold px-3 py-1 rounded-full ${getEstadoColor(
-                    exp.estado
+                    exp.estado,
                   )}`}
                 >
                   {exp.estado}
@@ -157,18 +148,14 @@ const ExpedienteTodos = () => {
 
               {/* Acciones */}
               <div className="col-span-1 flex items-center justify-center gap-2">
-
                 <button
                   onClick={() => {
                     if (
                       window.confirm(
-                        `¿Deseas eliminar el expediente ${exp.numero}?`
+                        `¿Deseas eliminar el expediente ${exp.numero}?`,
                       )
                     ) {
-                      console.log(
-                        "Eliminar expediente:",
-                        exp.numero
-                      );
+                      console.log("Eliminar expediente:", exp.numero);
                     }
                   }}
                   className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 hover:bg-red-100 transition"
@@ -180,13 +167,10 @@ const ExpedienteTodos = () => {
                   onClick={() => {
                     if (
                       window.confirm(
-                        `¿Deseas eliminar el expediente ${exp.numero}?`
+                        `¿Deseas eliminar el expediente ${exp.numero}?`,
                       )
                     ) {
-                      console.log(
-                        "Eliminar expediente:",
-                        exp.numero
-                      );
+                      console.log("Eliminar expediente:", exp.numero);
                     }
                   }}
                   className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 hover:bg-red-100 transition"
