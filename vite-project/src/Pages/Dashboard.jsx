@@ -102,16 +102,29 @@ function AlertaBanner({ mensaje, tipo = "warning", onClose }) {
   const s = ALERTA_STYLES[tipo] ?? ALERTA_STYLES.warning;
   return (
     <div
-      className={`flex items-start gap-3 border rounded-xl px-4 py-3 ${s.wrap}`}
+      className={`flex items-center gap-3 border rounded-xl px-4 py-3 ${s.wrap}`}
     >
-      <IcoAlert c={`w-4 h-4 flex-shrink-0 mt-0.5 ${s.icon}`} />
+      {/* Ícono de alerta */}
+      <IcoAlert c={`w-4 h-4 flex-shrink-0 ${s.icon}`} />
+
+      {/* Texto del mensaje */}
       <span className="flex-1 text-sm leading-snug">{mensaje}</span>
+
+      {/* Botón cerrar — X */}
       <button
+        type="button"
         onClick={onClose}
-        aria-label="Cerrar alerta"
-        className={`flex-shrink-0 p-1 rounded-lg transition-colors ${s.close}`}
+        aria-label="Cerrar notificación"
+        style={{ minWidth: "24px", minHeight: "24px" }}
+        className={[
+          "flex-shrink-0 flex items-center justify-center",
+          "w-6 h-6 rounded-full",
+          "border border-current border-opacity-30",
+          "transition-colors duration-150 cursor-pointer",
+          s.close,
+        ].join(" ")}
       >
-        <IcoX c="w-3.5 h-3.5" />
+        <IcoX c="w-3 h-3" />
       </button>
     </div>
   );
@@ -168,144 +181,6 @@ function StatCard({ titulo, valor, subtitulo, iconBg, icon }) {
   );
 }
 
-// ─── Modal nuevo expediente ───────────────────────────────────────────────────
-
-function ModalNuevoExpediente({ open, onClose, onSave }) {
-  const [form, setForm] = useState({
-    numero: "",
-    descripcion: "",
-    categoria: "Docentes",
-    estado: "Ingresado",
-  });
-  const handleChange = (e) =>
-    setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSave?.(form);
-    setForm({
-      numero: "",
-      descripcion: "",
-      categoria: "Docentes",
-      estado: "Ingresado",
-    });
-    onClose();
-  };
-  if (!open) return null;
-  return (
-    <div
-      className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-[2px]
-                    flex items-end sm:items-center justify-center p-0 sm:p-4"
-      onClick={(e) => e.target === e.currentTarget && onClose()}
-    >
-      <div className="bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden">
-        <div className="h-1 bg-gradient-to-r from-[#1a3a6b] via-[#1a5faa] to-[#c8102e]" />
-        <div className="p-5 sm:p-7">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base sm:text-lg font-bold text-slate-900">
-              Nuevo expediente
-            </h2>
-            <button
-              onClick={onClose}
-              className="text-slate-400 hover:text-slate-600 p-1 rounded-lg
-                         hover:bg-slate-100 transition-colors text-lg leading-none"
-            >
-              ✕
-            </button>
-          </div>
-          <p className="text-xs text-slate-400 mb-4">
-            Completá los datos para ingresar un nuevo expediente al sistema.
-          </p>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-3.5">
-            <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1.5">
-                Número de expediente
-              </label>
-              <input
-                name="numero"
-                value={form.numero}
-                onChange={handleChange}
-                placeholder="EXP-2026-XXX"
-                required
-                className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm
-                           outline-none focus:border-[#1a3a6b] focus:ring-2 focus:ring-[#1a3a6b]/10 transition"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1.5">
-                Descripción
-              </label>
-              <input
-                name="descripcion"
-                value={form.descripcion}
-                onChange={handleChange}
-                placeholder="Descripción del expediente"
-                required
-                className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm
-                           outline-none focus:border-[#1a3a6b] focus:ring-2 focus:ring-[#1a3a6b]/10 transition"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-semibold text-slate-600 mb-1.5">
-                  Categoría
-                </label>
-                <select
-                  name="categoria"
-                  value={form.categoria}
-                  onChange={handleChange}
-                  className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm
-                             outline-none focus:border-[#1a3a6b] bg-white transition"
-                >
-                  {["Docentes", "Alumnos", "Administrativo", "Otros"].map(
-                    (o) => (
-                      <option key={o}>{o}</option>
-                    ),
-                  )}
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-600 mb-1.5">
-                  Estado inicial
-                </label>
-                <select
-                  name="estado"
-                  value={form.estado}
-                  onChange={handleChange}
-                  className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm
-                             outline-none focus:border-[#1a3a6b] bg-white transition"
-                >
-                  {["Ingresado", "Comisión"].map((o) => (
-                    <option key={o}>{o}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div className="flex gap-2 pt-1">
-              <button
-                type="button"
-                onClick={onClose}
-                className="flex-1 sm:flex-none px-4 py-2.5 text-sm font-medium
-                           text-slate-600 bg-slate-50 border border-slate-200
-                           rounded-xl hover:bg-slate-100 transition"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                className="flex-1 sm:flex-none px-5 py-2.5 text-sm font-bold
-                           text-white bg-[#1a3a6b] hover:bg-[#14305c]
-                           rounded-xl transition shadow-sm"
-              >
-                Guardar
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // ─── Dashboard principal ──────────────────────────────────────────────────────
 
 export default function Dashboard() {
@@ -325,6 +200,7 @@ export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
+  const [consejeros, setConsejeros] = useState([]);
   // índices de alertas que el usuario cerró (solo persiste en la sesión actual)
   const [dismissedAlerts, setDismissedAlerts] = useState(new Set());
 
@@ -339,6 +215,7 @@ export default function Dashboard() {
       } catch {}
     }
     fetchData();
+    fetchConsejeros();
   }, []);
 
   const fetchData = async () => {
@@ -355,12 +232,27 @@ export default function Dashboard() {
     }
   };
 
+  const fetchConsejeros = async () => {
+    try {
+      const { data } = await axios.get(`${API}/consejeros`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      setConsejeros(data);
+    } catch (error) {
+      console.error("Error cargando consejeros:", error);
+    }
+  };
+
   const handleSave = async (form) => {
     try {
       await axios.post(`${API}/expedientes`, form, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       fetchData();
+      fetchConsejeros();
     } catch (e) {
       console.error(e);
     }
@@ -405,6 +297,14 @@ export default function Dashboard() {
         ];
   const ordenDia = data.ordenDia?.filter((i) => i.estado === "Despacho") ?? [];
 
+  const consejerosActivos = consejeros.filter(
+    (c) => c.estado !== "Con licencia",
+  ).length;
+
+  const consejerosLicencia = consejeros.filter(
+    (c) => c.estado === "Con licencia",
+  ).length;
+
   return (
     /*
      * ─── LAYOUT PRINCIPAL ───────────────────────────────────────────
@@ -446,33 +346,24 @@ export default function Dashboard() {
               Resumen general del sistema
             </p>
           </div>
-          <button
-            onClick={() => setModalOpen(true)}
-            className="self-start sm:self-auto flex items-center gap-2
-                       bg-[#1a3a6b] hover:bg-[#14305c] text-white
-                       text-sm font-semibold px-4 py-2.5 rounded-xl
-                       transition shadow-sm"
-          >
-            <IcoPlus c="w-4 h-4" /> Nuevo expediente
-          </button>
         </div>
 
         {/* ── ALERTAS ── */}
+        {/* ── ALERTAS ── */}
         {data.alertas?.length > 0 && (
-          <div className="flex flex-col gap-2 mb-6">
-            {data.alertas.map((a, i) => (
-              <div
-                key={i}
-                className="flex items-start gap-3 bg-amber-50 border border-amber-300
-                           text-amber-800 text-sm rounded-xl px-4 py-3"
-              >
-                <IcoAlert c="w-4 h-4 flex-shrink-0 text-amber-500 mt-0.5" />
-                <span className="leading-snug">{a.mensaje}</span>
-              </div>
-            ))}
+          <div className="flex flex-col gap-3 mb-6">
+            {data.alertas
+              .filter((_, idx) => !dismissedAlerts.has(idx))
+              .map((a, idx) => (
+                <AlertaBanner
+                  key={idx}
+                  mensaje={a.mensaje}
+                  tipo={a.tipo || "warning"}
+                  onClose={() => dismissAlert(idx)}
+                />
+              ))}
           </div>
         )}
-
         {/* ── TARJETAS MÉTRICAS ─────────────────────────────────────────
          *   2 cols en mobile, 4 cols en pantallas md+
          * ──────────────────────────────────────────────────────────── */}
@@ -493,8 +384,8 @@ export default function Dashboard() {
           />
           <StatCard
             titulo="Consejeros activos"
-            valor={loading ? "…" : data.consejerosActivos}
-            subtitulo={`${data.consejerosLicencia ?? 0} con licencia`}
+            valor={loading ? "…" : consejerosActivos}
+            subtitulo={`${consejerosLicencia} con licencia`}
             iconBg="bg-green-50 text-green-600"
             icon={<IcoUsers />}
           />
@@ -742,12 +633,6 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
-
-      <ModalNuevoExpediente
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        onSave={handleSave}
-      />
     </div>
   );
 }
