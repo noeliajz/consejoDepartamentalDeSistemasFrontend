@@ -38,6 +38,7 @@ import NuevoConsejero from "../Pages/NuevoConsejero";
 import NuevoUsuario from "../Pages/NuevoUsuario";
 import EditarUsuario from "../Pages/EditarUsuario";
 import PaginaPrincipal from "../Pages/PaginaPrincipal";
+import VerReunion from "../Pages/VerReunion";
 
 const RoutesView = () => {
   return (
@@ -81,6 +82,7 @@ const RoutesView = () => {
       <Route path="/EditarUsuario/:id" element={<EditarUsuario />} />
       <Route path="/" element={<PaginaPrincipal />} />
       <Route path="/OlvidarContrasenia" element={<OlvidarContrasenia />} />
+      <Route path="/VerReunion/:id" element={<VerReunion />} />
     </Routes>
   );
 };
