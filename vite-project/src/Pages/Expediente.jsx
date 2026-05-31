@@ -116,16 +116,33 @@ export default function Expediente() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-100 flex">
-      {/* Sidebar */}
+    <div className="min-h-screen bg-[#f0f4f8] pt-16">
       <NavbarHorizontalAdmin user={{ role: "admin" }} />
 
-      {/* Main */}
-      <main className="flex-1 ml-64 p-8">
+      <main
+        className="
+      max-w-screen-xl
+      mx-auto
+      px-4
+      sm:px-6
+      lg:px-8
+      py-6
+    "
+      >
         {/* Header */}
-        <div className="flex items-start justify-between mb-10">
+        <div
+          className="
+            flex
+            flex-col
+            lg:flex-row
+            lg:items-center
+            justify-between
+            gap-4
+            mb-8
+          "
+        >
           <div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
               Expedientes
             </h1>
 
@@ -134,7 +151,7 @@ export default function Expediente() {
             </p>
           </div>
 
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-6 flex-wrap">
             <button className="relative text-gray-700 hover:text-black transition">
               <Bell size={22} />
 
@@ -155,8 +172,8 @@ export default function Expediente() {
                 flex
                 items-center
                 gap-2
-                shadow
-              "
+                shadow  
+                "
             >
               Nuevo expediente
               <Plus size={18} />
@@ -165,10 +182,21 @@ export default function Expediente() {
         </div>
 
         {/* FILTROS */}
-        <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-6 mb-8">
+        <div
+          className="
+              bg-white
+              rounded-3xl
+              border
+              border-gray-200
+              shadow-sm
+              p-4
+              md:p-6
+              mb-8
+            "
+        >
           <div className="flex flex-col lg:flex-row gap-4 lg:items-center lg:justify-between">
             {/* BUSCAR */}
-            <div className="relative w-full lg:max-w-sm">
+            <div className="relative flex-1 min-w-[250px]">
               <Search
                 size={18}
                 className="
@@ -202,7 +230,16 @@ export default function Expediente() {
             </div>
 
             {/* DROPDOWNS */}
-            <div className="flex flex-wrap gap-4">
+            <div
+              className="
+                flex
+                flex-col
+                sm:flex-row
+                gap-4
+                w-full
+                lg:w-auto
+              "
+            >
               {/* ESTADO */}
               <div className="relative">
                 <button
@@ -221,7 +258,7 @@ export default function Expediente() {
                     px-4
                     py-3
                     text-sm
-                    min-w-[170px]
+                    w-full sm:min-w-[190px]
                     justify-between
                   "
                 >
@@ -295,7 +332,7 @@ export default function Expediente() {
                     px-4
                     py-3
                     text-sm
-                    min-w-[170px]
+                    w-full sm:min-w-[190px]
                     justify-between
                   "
                 >
@@ -357,19 +394,20 @@ export default function Expediente() {
         {/* TABLA */}
         <div
           className="
-          bg-white
-          rounded-3xl
-          border
-          border-gray-200
-          shadow-sm
-          overflow-hidden
-        "
+            bg-white
+            rounded-3xl
+            border
+            border-gray-200
+            shadow-sm
+            overflow-hidden
+          "
         >
+          <div className="overflow-x-auto"></div>
           {/* HEADER */}
           <div
             className="
             grid
-            grid-cols-12
+            grid-cols-[150px_250px_120px_120px_120px_220px]
             gap-4
             px-8
             py-5
@@ -381,17 +419,17 @@ export default function Expediente() {
             uppercase
           "
           >
-            <div className="col-span-2">N° expediente</div>
+            <div>N° expediente</div>
 
-            <div className="col-span-4">Descripción</div>
+            <div>Descripción</div>
 
-            <div className="col-span-1">Categoría</div>
+            <div>Categoría</div>
 
-            <div className="col-span-1">Ingreso</div>
+            <div>Ingreso</div>
 
-            <div className="col-span-2">Estado</div>
+            <div>Estado</div>
 
-            <div className="col-span-2 text-center">Acciones</div>
+            <div>Acciones</div>
           </div>
 
           {/* FILAS */}
@@ -400,7 +438,7 @@ export default function Expediente() {
               key={exp._id}
               className="
                 grid
-                grid-cols-12
+                grid-cols-[150px_250px_120px_120px_120px_220px]
                 gap-4
                 px-8
                 py-5
@@ -411,13 +449,11 @@ export default function Expediente() {
                 transition
               "
             >
-              <div className="col-span-2 font-medium text-gray-800">
-                {exp.numero}
-              </div>
+              <div className=" font-medium text-gray-800">{exp.numero}</div>
 
-              <div className="col-span-4 text-gray-700">{exp.descripcion}</div>
+              <div className=" text-gray-700">{exp.descripcion}</div>
 
-              <div className="col-span-1">
+              <div>
                 <span
                   className="
                   rounded-full
@@ -433,11 +469,9 @@ export default function Expediente() {
                 </span>
               </div>
 
-              <div className="col-span-1 text-gray-600">
-                {exp.fecha_ingreso}
-              </div>
+              <div className=" text-gray-600">{exp.fecha_ingreso}</div>
 
-              <div className="col-span-2">
+              <div>
                 <span
                   className={`
                   rounded-full
@@ -455,7 +489,6 @@ export default function Expediente() {
               {/* ACCIONES */}
               <div
                 className="
-                col-span-2
                 flex
                 items-center
                 justify-center

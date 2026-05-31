@@ -39,6 +39,41 @@ const NuevoExpediente = () => {
 
   // CREAR EXPEDIENTE
   const handleCrearExpediente = async () => {
+    // VALIDACIONES
+    if (!numero.trim()) {
+      alert("Debe ingresar el número de expediente");
+      return;
+    }
+
+    if (!fechaCreacion) {
+      alert("Debe ingresar la fecha de creación");
+      return;
+    }
+
+    if (!fechaIngreso) {
+      alert("Debe ingresar la fecha de ingreso");
+      return;
+    }
+
+    if (!categoria) {
+      alert("Debe seleccionar una categoría");
+      return;
+    }
+
+    if (!tipoTramite || tipoTramite === "Seleccionar...") {
+      alert("Debe seleccionar un tipo de trámite");
+      return;
+    }
+
+    if (!solicitante.trim()) {
+      alert("Debe ingresar el solicitante");
+      return;
+    }
+
+    if (!descripcion.trim()) {
+      alert("Debe ingresar una descripción");
+      return;
+    }
     try {
       setLoading(true);
 
@@ -105,35 +140,42 @@ const NuevoExpediente = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 flex">
+    <div className="min-h-screen bg-[#f0f4f8]">
       {/* SIDEBAR */}
       <NavbarHorizontalAdmin user={{ role: "admin" }} />
 
       {/* CONTENIDO */}
-      <main className="flex-1 ml-64 p-8">
-        <div className="max-w-6xl mx-auto">
+      <main className="pt-20 pb-8 px-3 sm:px-4 md:px-6 lg:px-8">
+        <div className="w-full max-w-7xl mx-auto">
           {/* HEADER */}
-          <div className="bg-gradient-to-r from-blue-700 to-blue-600 rounded-t-2xl p-6 flex items-center justify-between shadow-lg">
+          <div className="bg-[#1a3a6b] rounded-t-2xl p-4 sm:p-6 lg:p-8 shadow-lg">
             <div>
-              <h1 className="text-3xl font-bold text-white">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">
                 Nuevo expediente
               </h1>
 
-              <p className="text-blue-100 mt-1">
+              <p className="text-blue-100 mt-2 text-sm sm:text-base">
                 Consejo Directivo - UTN Facultad Regional
               </p>
             </div>
           </div>
 
           {/* FORM */}
-          <div className="bg-white rounded-b-2xl p-8 shadow-xl">
+          <div
+            className="bg-white
+              rounded-b-2xl
+              p-4
+              sm:p-6
+              lg:p-8
+              shadow-xl"
+          >
             {/* IDENTIFICACIÓN */}
             <div className="mb-10">
-              <h2 className="text-3xl font-bold text-slate-800 mb-6 border-b border-slate-200 pb-3">
+              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-800 mb-6 border-b border-slate-200 pb-3">
                 IDENTIFICACIÓN DEL EXPEDIENTE
               </h2>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {/* NUMERO */}
                 <div>
                   <label className="block mb-2 text-sm font-semibold text-slate-700">
@@ -141,6 +183,7 @@ const NuevoExpediente = () => {
                   </label>
 
                   <input
+                    required
                     type="text"
                     value={numero}
                     onChange={(e) => setNumero(e.target.value)}
@@ -164,6 +207,7 @@ const NuevoExpediente = () => {
                   </label>
 
                   <input
+                    required
                     type="date"
                     value={fechaCreacion}
                     onChange={(e) => setFechaCreacion(e.target.value)}
@@ -186,6 +230,7 @@ const NuevoExpediente = () => {
                   </label>
 
                   <input
+                    required
                     type="date"
                     value={fechaIngreso}
                     onChange={(e) => setFechaIngreso(e.target.value)}
@@ -205,7 +250,7 @@ const NuevoExpediente = () => {
 
             {/* DESCRIPCION */}
             <div>
-              <h2 className="text-3xl font-bold text-slate-800 mb-6 border-b border-slate-200 pb-3">
+              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-800 mb-6 border-b border-slate-200 pb-3">
                 DESCRIPCIÓN DEL TRÁMITE
               </h2>
 
@@ -217,6 +262,7 @@ const NuevoExpediente = () => {
                   </label>
 
                   <select
+                    required
                     value={categoria}
                     onChange={(e) => setCategoria(e.target.value)}
                     className="
@@ -246,6 +292,7 @@ const NuevoExpediente = () => {
                   </label>
 
                   <select
+                    required
                     value={tipoTramite}
                     onChange={(e) => setTipoTramite(e.target.value)}
                     className="
@@ -270,7 +317,15 @@ const NuevoExpediente = () => {
 
             {/* INFORMACION */}
             <div className="mt-10">
-              <div className="bg-slate-50 rounded-2xl border border-slate-200 p-8">
+              <div
+                className="bg-[#f8fafc]
+                  rounded-2xl
+                  border
+                  border-slate-200
+                  p-4
+                  sm:p-6
+                  lg:p-8"
+              >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* SOLICITANTE */}
                   <div>
@@ -279,6 +334,7 @@ const NuevoExpediente = () => {
                     </label>
 
                     <input
+                      required
                       type="text"
                       value={solicitante}
                       onChange={(e) => setSolicitante(e.target.value)}
@@ -301,6 +357,7 @@ const NuevoExpediente = () => {
                     </label>
 
                     <input
+                      required
                       type="text"
                       value={dniLegajo}
                       onChange={(e) => setDniLegajo(e.target.value)}
@@ -346,6 +403,7 @@ const NuevoExpediente = () => {
                   </label>
 
                   <select
+                    required
                     value={comision}
                     onChange={(e) => setComision(e.target.value)}
                     className="
@@ -375,6 +433,7 @@ const NuevoExpediente = () => {
                   </label>
 
                   <select
+                    required
                     value={estado}
                     onChange={(e) => setEstado(e.target.value)}
                     className="
@@ -396,20 +455,26 @@ const NuevoExpediente = () => {
                 </div>
 
                 {/* BOTON */}
-                <div className="flex justify-end mt-10">
+                <div className="flex justify-center sm:justify-end mt-10">
                   <button
                     onClick={handleCrearExpediente}
                     disabled={loading}
                     className="
-                      px-6
-                      py-3
-                      rounded-xl
-                      bg-blue-600
-                      hover:bg-blue-700
-                      transition
-                      font-semibold
-                      text-white
-                    "
+                        w-full
+                        sm:w-auto
+                        px-8
+                        py-3
+                        rounded-xl
+                        bg-[#1a3a6b]
+                        hover:bg-[#153057]
+                        transition-all
+                        duration-200
+                        font-semibold
+                        text-white
+                        shadow-md
+                        disabled:opacity-60
+                        disabled:cursor-not-allowed
+                      "
                   >
                     {loading ? "Guardando..." : "Guardar expediente"}
                   </button>
