@@ -233,7 +233,7 @@ const Reunion = () => {
                   {/* ACCIONES */}
                   <div className="flex items-center justify-center gap-2">
                     <button
-                      onClick={() => navigate(`/reunion/${reunion._id}`)}
+                      onClick={() => navigate(`/VerReunion/${reunion._id}`)}
                       className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700 hover:bg-blue-100 whitespace-nowrap"
                     >
                       Ver
