@@ -2,11 +2,20 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import NavbarHorizontalAdmin from "../components/NavbarHorizontalAdmin";
-import { Bell, Plus, CalendarDays, Users, FileText } from "lucide-react";
+import {
+  Bell,
+  Plus,
+  CalendarDays,
+  Users,
+  FileText,
+  ChevronDown,
+} from "lucide-react";
 
 const Reunion = () => {
   const navigate = useNavigate();
   const [reuniones, setReuniones] = useState([]);
+  const [busquedaFecha, setBusquedaFecha] = useState("");
+  const [filtroTipo, setFiltroTipo] = useState("Todos");
 
   const obtenerReuniones = async () => {
     try {
@@ -55,6 +64,13 @@ const Reunion = () => {
     }
   };
 
+  // FORMATEAR FECHA SIN DESFASE DE ZONA HORARIA
+  const formatearFecha = (fechaStr) => {
+    if (!fechaStr) return "—";
+    const [anio, mes, dia] = fechaStr.split("-");
+    return `${dia}/${mes}/${anio}`;
+  };
+
   const totalReuniones = reuniones.length;
   const reunionesOrdinarias = reuniones.filter(
     (r) => r.tipo === "Ordinaria",
@@ -62,6 +78,16 @@ const Reunion = () => {
   const reunionesExtraordinarias = reuniones.filter(
     (r) => r.tipo === "Extraordinaria",
   ).length;
+
+  // FILTROS
+  const reunionesFiltradas = reuniones.filter((reunion) => {
+    const coincideFecha = !busquedaFecha || reunion.fecha === busquedaFecha;
+    const coincideTipo = filtroTipo === "Todos" || reunion.tipo === filtroTipo;
+    return coincideFecha && coincideTipo;
+  });
+
+  const GRID =
+    "grid-cols-[140px_140px_110px_110px_110px_110px_180px_300px_120px_240px]";
 
   return (
     <div className="min-h-screen bg-[#f0f4f8] pt-16">
@@ -158,80 +184,165 @@ const Reunion = () => {
         {/* TABLA */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
           {/* HEADER TABLA */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between px-5 py-5 border-b border-slate-200 gap-3">
-            <div>
-              <h2 className="text-lg font-semibold text-slate-800">
-                Historial de reuniones
-              </h2>
-              <p className="text-sm text-slate-500 mt-0.5">
-                Reuniones registradas del consejo
-              </p>
+          <div className="flex flex-col gap-4 px-5 py-5 border-b border-slate-200">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-800">
+                  Historial de reuniones
+                </h2>
+                <p className="text-sm text-slate-500 mt-0.5">
+                  Reuniones registradas del consejo
+                </p>
+              </div>
+              <button
+                onClick={() => navigate("/NuevaReunion")}
+                className="flex items-center gap-2 text-white px-4 py-2 rounded-xl transition text-sm font-medium self-start sm:self-auto"
+                style={{ background: "#1a3a6b" }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.background = "#15305a")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.background = "#1a3a6b")
+                }
+              >
+                <Plus size={15} />
+                Nueva
+              </button>
             </div>
-            <button
-              onClick={() => navigate("/NuevaReunion")}
-              className="flex items-center gap-2 text-white px-4 py-2 rounded-xl transition text-sm font-medium self-start sm:self-auto"
-              style={{ background: "#1a3a6b" }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.background = "#15305a")
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.background = "#1a3a6b")
-              }
-            >
-              <Plus size={15} />
-              Nueva
-            </button>
+
+            {/* FILTROS */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              {/* BUSCAR POR FECHA */}
+              <div className="relative flex-1">
+                <CalendarDays
+                  size={15}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                />
+                <input
+                  type="date"
+                  value={busquedaFecha}
+                  onChange={(e) => setBusquedaFecha(e.target.value)}
+                  className="w-full border border-slate-200 rounded-xl pl-9 pr-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-200 bg-slate-50"
+                />
+              </div>
+
+              {/* FILTRAR POR TIPO */}
+              <div className="relative sm:w-52">
+                <select
+                  value={filtroTipo}
+                  onChange={(e) => setFiltroTipo(e.target.value)}
+                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-200 bg-slate-50 appearance-none"
+                >
+                  <option value="Todos">Todos los tipos</option>
+                  <option value="Ordinaria">Ordinaria</option>
+                  <option value="Extraordinaria">Extraordinaria</option>
+                </select>
+                <ChevronDown
+                  size={14}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                />
+              </div>
+
+              {/* LIMPIAR */}
+              {(busquedaFecha || filtroTipo !== "Todos") && (
+                <button
+                  onClick={() => {
+                    setBusquedaFecha("");
+                    setFiltroTipo("Todos");
+                  }}
+                  className="px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-500 hover:bg-slate-100 transition whitespace-nowrap"
+                >
+                  Limpiar
+                </button>
+              )}
+            </div>
           </div>
 
           {/* SCROLL HORIZONTAL */}
           <div className="overflow-x-auto">
-            <div className="min-w-[800px]">
+            <div className="min-w-[1750px]">
               {/* ENCABEZADOS */}
-              <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_220px] gap-4 px-6 py-4 bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wide">
+              <div
+                className={`grid ${GRID} gap-3 px-6 py-4 bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wide`}
+              >
                 <div>Fecha</div>
                 <div>Tipo</div>
-                <div>Quórum</div>
+                <div>Hora inicio</div>
+                <div>Hora cierre</div>
+                <div>Q. Presente</div>
+                <div>Q. Requerido</div>
+                <div>Lugar</div>
                 <div>Temas</div>
                 <div>Estado</div>
                 <div className="text-center">Acciones</div>
               </div>
 
               {/* FILAS */}
-              {reuniones.map((reunion) => (
+              {reunionesFiltradas.map((reunion) => (
                 <div
                   key={reunion._id}
-                  className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_220px] gap-4 px-6 py-4 items-center border-b border-slate-100 hover:bg-slate-50 transition"
+                  className={`grid ${GRID} gap-3 px-6 py-4 items-center border-b border-slate-100 hover:bg-slate-50 transition`}
                 >
-                  <div className="text-slate-600 text-sm">
-                    {new Date(reunion.fecha).toLocaleDateString("es-AR")}
+                  {/* FECHA — sin desfase de zona horaria */}
+                  <div className="text-slate-600 text-sm whitespace-nowrap">
+                    {formatearFecha(reunion.fecha)}
                   </div>
 
                   <div>
                     <span
-                      className={`px-3 py-1 rounded-full text-xs font-semibold ${getTipoColor(reunion.tipo)}`}
+                      className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${getTipoColor(reunion.tipo)}`}
                     >
                       {reunion.tipo}
                     </span>
                   </div>
 
+                  <div className="text-slate-600 text-sm">
+                    {reunion.horaInicio || "—"}
+                  </div>
+
+                  <div className="text-slate-600 text-sm">
+                    {reunion.horaCierre || "—"}
+                  </div>
+
                   <div className="text-slate-700 text-sm font-medium">
-                    {reunion.quorum}
+                    {reunion.quorumPresente || "—"}
+                  </div>
+
+                  <div className="text-slate-700 text-sm font-medium">
+                    {reunion.quorumRequerido || "—"}
                   </div>
 
                   <div className="text-slate-700 text-sm truncate">
-                    {reunion.temas}
+                    {reunion.lugar || "—"}
+                  </div>
+
+                  <div className="text-slate-700 text-sm max-w-[300px] overflow-hidden">
+                    {Array.isArray(reunion.temasDetalle) &&
+                    reunion.temasDetalle.length > 0 ? (
+                      reunion.temasDetalle.map((tema, i) => (
+                        <span
+                          key={tema._id || i}
+                          className="block truncate"
+                          title={tema.descripcion}
+                        >
+                          {tema.descripcion}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-slate-400 italic">Sin temas</span>
+                    )}
                   </div>
 
                   <div>
                     <span
-                      className={`px-3 py-1 rounded-full text-xs font-semibold ${getEstadoColor(reunion.estado)}`}
+                      className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${getEstadoColor(reunion.estado)}`}
                     >
-                      {reunion.estado}
+                      {reunion.estado || "—"}
                     </span>
                   </div>
 
                   {/* ACCIONES */}
-                  <div className="flex items-center justify-center gap-2">
+                  <div className="flex items-center justify-start gap-2 flex-wrap">
                     <button
                       onClick={() => navigate(`/VerReunion/${reunion._id}`)}
                       className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700 hover:bg-blue-100 whitespace-nowrap"
@@ -255,9 +366,11 @@ const Reunion = () => {
               ))}
 
               {/* VACÍO */}
-              {reuniones.length === 0 && (
+              {reunionesFiltradas.length === 0 && (
                 <div className="p-10 text-center text-slate-500 text-sm">
-                  No hay reuniones registradas
+                  {reuniones.length === 0
+                    ? "No hay reuniones registradas"
+                    : "No se encontraron reuniones con esos filtros"}
                 </div>
               )}
             </div>
