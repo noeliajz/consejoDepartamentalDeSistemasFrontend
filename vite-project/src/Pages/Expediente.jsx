@@ -7,6 +7,10 @@ import { Search, ChevronDown, Bell, Plus } from "lucide-react";
 
 import NavbarHorizontalAdmin from "../components/NavbarHorizontalAdmin";
 
+import jsPDF from "jspdf";
+
+import { Download } from "lucide-react";
+
 export default function Expediente() {
   const navigate = useNavigate();
 
@@ -68,6 +72,94 @@ export default function Expediente() {
 
       alert("Error al eliminar expediente");
     }
+  };
+
+  // GENERAR PDF
+  const generarPDF = (exp) => {
+    const doc = new jsPDF();
+
+    let y = 20;
+    const margen = 20;
+
+    // TÍTULO
+    doc.setFont("times", "bold");
+    doc.setFontSize(18);
+    doc.text("EXPEDIENTE", 105, y, { align: "center" });
+
+    y += 10;
+
+    doc.line(20, y, 190, y);
+
+    y += 15;
+
+    // DATOS GENERALES
+    doc.setFont("times", "normal");
+    doc.setFontSize(12);
+
+    doc.text(`Número: ${exp.numero || "-"}`, margen, y);
+    y += 10;
+
+    doc.text(`Fecha de creación: ${exp.fecha_creacion || "-"}`, margen, y);
+    y += 10;
+
+    doc.text(`Fecha de ingreso: ${exp.fecha_ingreso || "-"}`, margen, y);
+    y += 10;
+
+    doc.text(`Categoría: ${exp.categoria || "-"}`, margen, y);
+    y += 10;
+
+    doc.text(`Tipo de trámite: ${exp.tipo_tramite || "-"}`, margen, y);
+    y += 10;
+
+    doc.text(`Solicitante: ${exp.solicitante || "-"}`, margen, y);
+    y += 10;
+
+    doc.text(`DNI / Legajo: ${exp.dni_legajo || "-"}`, margen, y);
+    y += 10;
+
+    doc.text(`Comisión: ${exp.comision || "Sin asignar"}`, margen, y);
+    y += 10;
+
+    doc.text(`Estado: ${exp.estado || "-"}`, margen, y);
+
+    y += 20;
+
+    // DESCRIPCIÓN
+    doc.setFont("times", "bold");
+    doc.text("Descripción:", margen, y);
+
+    y += 8;
+
+    doc.setFont("times", "normal");
+
+    const descripcion = doc.splitTextToSize(
+      exp.descripcion || "Sin descripción",
+      170,
+    );
+
+    doc.text(descripcion, margen, y);
+
+    y += descripcion.length * 7 + 20;
+
+    // FIRMA
+    doc.line(20, y, 190, y);
+
+    y += 20;
+
+    doc.text("Firma Responsable", 70, y);
+
+    y += 5;
+
+    doc.line(40, y, 100, y);
+
+    // FOOTER
+    doc.setFontSize(10);
+
+    doc.text("Consejo Departamental - Ingeniería en Sistemas", 105, 285, {
+      align: "center",
+    });
+
+    doc.save(`Expediente_${exp.numero}.pdf`);
   };
 
   // CARGAR AL INICIAR
@@ -392,168 +484,89 @@ export default function Expediente() {
         </div>
 
         {/* TABLA */}
-        <div
-          className="
-            bg-white
-            rounded-3xl
-            border
-            border-gray-200
-            shadow-sm
-            overflow-hidden
-          "
-        >
-          <div className="overflow-x-auto"></div>
-          {/* HEADER */}
-          <div
-            className="
-            grid
-            grid-cols-[150px_250px_120px_120px_120px_220px]
-            gap-4
-            px-8
-            py-5
-            border-b
-            border-gray-100
-            text-sm
-            font-semibold
-            text-gray-500
-            uppercase
-          "
-          >
-            <div>N° expediente</div>
-
-            <div>Descripción</div>
-
-            <div>Categoría</div>
-
-            <div>Ingreso</div>
-
-            <div>Estado</div>
-
-            <div>Acciones</div>
-          </div>
-
-          {/* FILAS */}
-          {expedientesFiltrados.map((exp) => (
-            <div
-              key={exp._id}
-              className="
-                grid
-                grid-cols-[150px_250px_120px_120px_120px_220px]
-                gap-4
-                px-8
-                py-5
-                items-center
-                border-b
-                border-gray-100
-                hover:bg-gray-50
-                transition
-              "
-            >
-              <div className=" font-medium text-gray-800">{exp.numero}</div>
-
-              <div className=" text-gray-700">{exp.descripcion}</div>
-
-              <div>
-                <span
-                  className="
-                  rounded-full
-                  bg-gray-100
-                  px-3
-                  py-1
-                  text-xs
-                  font-medium
-                  text-gray-700
-                "
-                >
-                  {exp.categoria}
-                </span>
+        <div className="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <div className="min-w-[1100px]">
+              {/* HEADER */}
+              <div className="grid grid-cols-[140px_120px_130px_130px_150px_130px_120px_120px_1fr] gap-3 px-6 py-5 border-b border-gray-100 text-xs font-semibold text-gray-500 uppercase">
+                <div>N° Expediente</div>
+                <div>Categoría</div>
+                <div>Fecha Creación</div>
+                <div>Fecha Ingreso</div>
+                <div>Tipo de Trámite</div>
+                <div>Solicitante</div>
+                <div>DNI / Legajo</div>
+                <div>Estado</div>
+                <div>Acciones</div>
               </div>
 
-              <div className=" text-gray-600">{exp.fecha_ingreso}</div>
-
-              <div>
-                <span
-                  className={`
-                  rounded-full
-                  px-3
-                  py-1
-                  text-xs
-                  font-semibold
-                  ${obtenerColorEstado(exp.estado)}
-                `}
+              {/* FILAS */}
+              {expedientesFiltrados.map((exp) => (
+                <div
+                  key={exp._id}
+                  className="grid grid-cols-[140px_120px_130px_130px_150px_130px_120px_120px_1fr] gap-3 px-6 py-5 items-center border-b border-gray-100 hover:bg-gray-50 transition"
                 >
-                  {exp.estado}
-                </span>
-              </div>
+                  <div className="font-semibold text-gray-800 text-sm truncate">
+                    {exp.numero}
+                  </div>
 
-              {/* ACCIONES */}
-              <div
-                className="
-                flex
-                items-center
-                justify-center
-                gap-2
-              "
-              >
-                {/* VER */}
-                <button
-                  onClick={() => navigate(`/expediente/${exp._id}`)}
-                  className="
-                    rounded-lg
-                    border
-                    border-gray-200
-                    bg-gray-50
-                    px-3
-                    py-2
-                    text-xs
-                    font-semibold
-                    text-gray-700
-                    hover:bg-gray-100
-                  "
-                >
-                  Ver
-                </button>
+                  <div>
+                    <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 whitespace-nowrap">
+                      {exp.categoria}
+                    </span>
+                  </div>
 
-                {/* EDITAR */}
-                <button
-                  onClick={() => navigate(`/EditarExpediente/${exp._id}`)}
-                  className="
-                    rounded-lg
-                    border
-                    border-blue-200
-                    bg-blue-50
-                    px-3
-                    py-2
-                    text-xs
-                    font-semibold
-                    text-blue-700
-                    hover:bg-blue-100
-                  "
-                >
-                  Editar
-                </button>
+                  <div className="text-gray-600 text-sm whitespace-nowrap">
+                    {exp.fecha_creacion}
+                  </div>
 
-                {/* ELIMINAR */}
-                <button
-                  onClick={() => eliminarExpediente(exp._id)}
-                  className="
-                    rounded-lg
-                    border
-                    border-red-200
-                    bg-red-50
-                    px-3
-                    py-2
-                    text-xs
-                    font-semibold
-                    text-red-700
-                    hover:bg-red-100
-                  "
-                >
-                  Eliminar
-                </button>
-              </div>
+                  <div className="text-gray-600 text-sm whitespace-nowrap">
+                    {exp.fecha_ingreso}
+                  </div>
+
+                  <div className="text-gray-700 text-sm truncate">
+                    {exp.tipo_tramite}
+                  </div>
+
+                  <div className="text-gray-700 text-sm truncate">
+                    {exp.solicitante}
+                  </div>
+
+                  <div className="text-gray-700 text-sm">{exp.dni_legajo}</div>
+
+                  <div>
+                    <span
+                      className={`rounded-full px-3 py-1 text-xs font-semibold whitespace-nowrap ${obtenerColorEstado(exp.estado)}`}
+                    >
+                      {exp.estado}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => navigate(`/EditarExpediente/${exp._id}`)}
+                      className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700 hover:bg-blue-100 whitespace-nowrap"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => generarPDF(exp)}
+                      className="flex items-center gap-1 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-xs font-semibold text-green-700 hover:bg-green-100 whitespace-nowrap"
+                    >
+                      <Download size={14} />
+                      PDF
+                    </button>
+                    <button
+                      onClick={() => eliminarExpediente(exp._id)}
+                      className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 hover:bg-red-100 whitespace-nowrap"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
       </main>
     </div>
